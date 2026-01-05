@@ -9,7 +9,6 @@ import com.devhjs.runningtracker.presentation.home.HomeScreen
 import com.devhjs.runningtracker.presentation.home.SetupScreen
 import com.devhjs.runningtracker.presentation.run.ResultScreen
 import com.devhjs.runningtracker.presentation.run.RunScreen
-import com.devhjs.runningtracker.presentation.settings.SettingsScreen
 import com.devhjs.runningtracker.presentation.statistics.StatisticsScreen
 
 @Composable
@@ -31,9 +30,6 @@ fun Navigation(
         }
         composable(Screen.StatisticsScreen.route) {
             StatisticsScreen(navController = navController)
-        }
-        composable(Screen.SettingsScreen.route) {
-            SettingsScreen(navController = navController)
         }
         composable(Screen.ResultScreen.route) {
             ResultScreen(navController = navController)

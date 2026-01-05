@@ -17,6 +17,8 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Composable
 fun FullScreenMap(
     modifier: Modifier = Modifier,
+    isMyLocationEnabled: Boolean = false,
+    isMyLocationButtonEnabled: Boolean = false,
     // Default to Seoul Hall for example or get current location if possible.
     // Ideally we pass current location here.
     cameraPositionState: CameraPositionState = rememberCameraPositionState {
@@ -28,14 +30,14 @@ fun FullScreenMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(
-                isMyLocationEnabled = true,
+                isMyLocationEnabled = isMyLocationEnabled,
                 isBuildingEnabled = true,
                 isTrafficEnabled = false
             ),
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = false,
                 compassEnabled = false,
-                myLocationButtonEnabled = false // Custom button usually
+                myLocationButtonEnabled = isMyLocationButtonEnabled
             )
         )
     }

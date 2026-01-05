@@ -2,10 +2,6 @@ package com.devhjs.runningtracker.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
 // Custom Colors
 val RunningGreen = Color(0xFF00E676)
 val RunningDarkGreen = Color(0xFF00B056)

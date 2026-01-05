@@ -8,7 +8,6 @@ import androidx.core.content.ContextCompat
 
 object TrackingUtility { 
 
-    // Adding this method back as it was removed during revert
     fun hasLocationPermissions(context: Context): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             return ContextCompat.checkSelfPermission(

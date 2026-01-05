@@ -85,6 +85,24 @@ fun RunScreen(
     val curTimeInMillis by TrackingService.timeRunInMillis.observeAsState(0L)
 
     val cameraPositionState = rememberCameraPositionState()
+    val fusedLocationClient = remember { com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(context) }
+
+    // Initial Map Center
+    LaunchedEffect(Unit) {
+        try {
+            val locationResult = fusedLocationClient.lastLocation
+            locationResult.addOnSuccessListener { location ->
+                location?.let {
+                    cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                        LatLng(it.latitude, it.longitude),
+                        MAP_ZOOM
+                    )
+                }
+            }
+        } catch (e: SecurityException) {
+            // Permission not granted or error
+        }
+    }
 
     // Additional state for "Locked" mode (as seen in screenshot)
     var isLocked by remember { mutableStateOf(false) }

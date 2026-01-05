@@ -38,6 +38,13 @@ import com.devhjs.runningtracker.ui.theme.RunningBlack
 import com.devhjs.runningtracker.ui.theme.RunningDarkGrey
 import com.devhjs.runningtracker.ui.theme.RunningGreen
 import com.devhjs.runningtracker.ui.theme.TextGrey
+import androidx.compose.runtime.remember
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.android.gms.location.LocationServices
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import com.devhjs.runningtracker.ui.theme.TextWhite
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -61,36 +68,37 @@ fun HomeScreen(
 
     val permissionState = rememberMultiplePermissionsState(permissions = permissionsToRequest)
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // 1. Full Screen Map Background
-        FullScreenMap()
+    val context = LocalContext.current
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+    val cameraPositionState = rememberCameraPositionState()
 
-        // 2. Top Bar (Settings)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 48.dp, start = 16.dp, end = 16.dp)
-        ) {
-            Text(
-                text = "RUNNING",
-                color = TextWhite,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                modifier = Modifier.align(Alignment.Center)
-            )
-            IconButton(
-                onClick = { navController.navigate(Screen.SettingsScreen.route) },
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .background(Color.Black.copy(alpha = 0.5f), shape = RoundedCornerShape(12.dp))
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings",
-                    tint = TextWhite
-                )
+    LaunchedEffect(permissionState.allPermissionsGranted) {
+        if (permissionState.allPermissionsGranted) {
+            try {
+                val locationResult = fusedLocationClient.lastLocation
+                locationResult.addOnSuccessListener { location ->
+                    location?.let {
+                        cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                            LatLng(it.latitude, it.longitude),
+                            15f
+                        )
+                    }
+                }
+            } catch (e: SecurityException) {
+                // Handle exception
             }
         }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        // 1. Full Screen Map Background
+        FullScreenMap(
+            isMyLocationEnabled = permissionState.allPermissionsGranted,
+            isMyLocationButtonEnabled = true,
+            cameraPositionState = cameraPositionState
+        )
+
+        // 2. Top Bar (REMOVED Settings)
 
         // 3. Bottom Card overlay
         Column(
