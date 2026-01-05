@@ -1,0 +1,36 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Android generic
+**/build
+.idea/
+!/gradle/wrapper/gradle-wrapper.jar
+
+# Google Services
+google-services.json
+
+# Keystore files
+*.jks
+*.keystore
+*.pem
+*.p12
+*.key
+
+# Bundle artifacts
+*.aab
+
+# Android Profiling
+*.hprof
