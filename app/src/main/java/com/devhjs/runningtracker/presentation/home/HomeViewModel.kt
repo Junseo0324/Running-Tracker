@@ -1,10 +1,8 @@
 package com.devhjs.runningtracker.presentation.home
 
-import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devhjs.runningtracker.presentation.navigation.Screen
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val fusedLocationProviderClient: FusedLocationProviderClient
+    private val locationRepository: com.devhjs.runningtracker.domain.repository.LocationRepository
 ): ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -42,28 +40,23 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    @SuppressLint("MissingPermission")
     private fun fetchCurrentLocation() {
         if(!_state.value.isPermissionGranted) return
         
         _state.update { it.copy(isLocationLoading = true) }
-        try {
-            fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
-                location?.let {
+        viewModelScope.launch {
+            try {
+                locationRepository.getLocationFlow().collect { location ->
                     _state.update { state -> 
                         state.copy(
-                            currentLocation = LatLng(it.latitude, it.longitude),
+                            currentLocation = LatLng(location.latitude, location.longitude),
                             isLocationLoading = false
                         )
                     }
-                } ?: run {
-                    _state.update { it.copy(isLocationLoading = false) }
                 }
-            }.addOnFailureListener {
-                _state.update { it.copy(isLocationLoading = false) }
+            } catch (e: Exception) {
+                 _state.update { it.copy(isLocationLoading = false) }
             }
-        } catch (e: SecurityException) {
-            _state.update { it.copy(isLocationLoading = false) }
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.devhjs.runningtracker.di
+package com.devhjs.runningtracker.core.di
 
 import android.app.NotificationManager
 import android.app.PendingIntent

@@ -34,4 +34,12 @@ object AppModule {
     fun provideFusedLocationProviderClient(
         @ApplicationContext app: Context
     ) = com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(app)
+
+    @Singleton
+    @Provides
+    fun provideLocationRepository(
+        client: com.google.android.gms.location.FusedLocationProviderClient
+    ): com.devhjs.runningtracker.domain.repository.LocationRepository {
+        return com.devhjs.runningtracker.data.repository.LocationRepositoryImpl(client)
+    }
 }
