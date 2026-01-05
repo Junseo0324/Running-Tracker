@@ -10,7 +10,8 @@ data class RunEntity(
     var avgSpeedInKMH: Float = 0f,
     var distanceInMeters: Int = 0,
     var timeInMillis: Long = 0L,
-    var caloriesBurned: Int = 0
+    var caloriesBurned: Int = 0,
+    var img: android.graphics.Bitmap? = null
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int? = null

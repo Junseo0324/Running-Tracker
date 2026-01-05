@@ -32,5 +32,10 @@ fun Navigation(
                 onNavigate = { route -> navController.navigate(route) }
             )
         }
+        composable(Screen.RunHistoryScreen.route) {
+             com.devhjs.runningtracker.presentation.history.RunHistoryScreenRoot(
+                 onNavigateUp = { navController.navigateUp() }
+             )
+        }
     }
 }

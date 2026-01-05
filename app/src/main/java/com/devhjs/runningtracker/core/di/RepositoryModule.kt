@@ -17,4 +17,11 @@ abstract class RepositoryModule {
     abstract fun bindMainRepository(
         mainRepositoryImpl: MainRepositoryImpl
     ): MainRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindTrackingRepository(
+        trackingRepositoryImpl: com.devhjs.runningtracker.data.repository.TrackingRepositoryImpl
+    ): com.devhjs.runningtracker.domain.repository.TrackingRepository
+
 }

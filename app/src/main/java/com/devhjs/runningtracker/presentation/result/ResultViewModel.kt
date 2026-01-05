@@ -7,7 +7,7 @@ import com.devhjs.runningtracker.core.util.TrackingUtility
 import com.devhjs.runningtracker.domain.model.Run
 import com.devhjs.runningtracker.domain.repository.MainRepository
 import com.devhjs.runningtracker.presentation.navigation.Screen
-import com.devhjs.runningtracker.service.TrackingService
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -19,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ResultViewModel @Inject constructor(
-    val mainRepository: MainRepository
+    val mainRepository: MainRepository,
+    private val trackingRepository: com.devhjs.runningtracker.domain.repository.TrackingRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ResultState())
@@ -33,15 +34,19 @@ class ResultViewModel @Inject constructor(
     // If ResultScreen is shown, typically tracking is PAUSED or implicitly STOPPED capturing but service alive.
     
     init {
-        // Observe Service Data to populate ResultState
-        TrackingService.pathPoints.observeForever { pathPoints ->
-            _state.update { it.copy(pathPoints = pathPoints) }
-            calculateStats()
+        // Observe Repository Data to populate ResultState
+        viewModelScope.launch {
+            trackingRepository.pathPoints.collect { pathPoints ->
+                _state.update { it.copy(pathPoints = pathPoints) }
+                calculateStats()
+            }
         }
         
-        TrackingService.timeRunInMillis.observeForever { timeInMillis ->
-             _state.update { it.copy(timeInMillis = timeInMillis) }
-            calculateStats()
+        viewModelScope.launch {
+            trackingRepository.timeRunInMillis.collect { timeInMillis ->
+                _state.update { it.copy(timeInMillis = timeInMillis) }
+                calculateStats()
+            }
         }
     }
     
@@ -80,13 +85,13 @@ class ResultViewModel @Inject constructor(
                     _event.emit(ResultEvent.Navigate(Screen.HomeScreen.route))
                 }
             }
-            ResultAction.OnSaveClick -> {
-                saveRun()
+            is ResultAction.OnSaveClick -> {
+                saveRun(action.bitmap)
             }
         }
     }
 
-    private fun saveRun() {
+    private fun saveRun(bitmap: android.graphics.Bitmap?) {
         val currentState = _state.value
         val timestamp = Calendar.getInstance().timeInMillis
         
@@ -95,7 +100,8 @@ class ResultViewModel @Inject constructor(
             avgSpeedInKMH = currentState.avgSpeed,
             distanceInMeters = currentState.distanceInMeters.toInt(),
             timeInMillis = currentState.timeInMillis,
-            caloriesBurned = currentState.caloriesBurned
+            caloriesBurned = currentState.caloriesBurned,
+            img = bitmap
         )
         
         viewModelScope.launch {

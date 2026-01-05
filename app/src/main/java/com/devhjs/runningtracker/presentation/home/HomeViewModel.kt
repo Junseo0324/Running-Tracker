@@ -38,6 +38,11 @@ class HomeViewModel @Inject constructor(
                     _event.emit(HomeEvent.Navigate(Screen.RunScreen.route))
                 }
             }
+            HomeAction.OnHistoryClick -> {
+                viewModelScope.launch {
+                    _event.emit(HomeEvent.Navigate(Screen.RunHistoryScreen.route))
+                }
+            }
         }
     }
 

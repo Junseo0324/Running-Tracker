@@ -59,15 +59,18 @@ fun ResultScreen(
     val cameraPositionState = rememberCameraPositionState()
 
     LaunchedEffect(key1 = state.pathPoints) {
-        if (state.pathPoints.isNotEmpty() && state.pathPoints.last().isNotEmpty()) {
-            cameraPositionState.move(
-                 CameraUpdateFactory.newLatLngZoom(
-                     state.pathPoints.last().last(),
-                     MAP_ZOOM
-                 )
+        if (state.pathPoints.isNotEmpty() && state.pathPoints.flatten().isNotEmpty()) {
+            val boundsBuilder = com.google.android.gms.maps.model.LatLngBounds.Builder()
+            state.pathPoints.flatten().forEach { boundsBuilder.include(it) }
+            val bounds = boundsBuilder.build()
+            
+            cameraPositionState.animate(
+                 CameraUpdateFactory.newLatLngBounds(bounds, 100)
             )
         }
     }
+
+    var googleMap: com.google.android.gms.maps.GoogleMap? by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         // 1. Map Background
@@ -75,6 +78,7 @@ fun ResultScreen(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = false),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 350.dp),
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = false,
                 myLocationButtonEnabled = false,
@@ -82,6 +86,9 @@ fun ResultScreen(
                 zoomGesturesEnabled = true
             )
         ) {
+            com.google.maps.android.compose.MapEffect(Unit) { map ->
+                googleMap = map
+            }
              state.pathPoints.forEach { polyline ->
                 Polyline(
                     points = polyline,
@@ -171,7 +178,9 @@ fun ResultScreen(
                 PrimaryButton(
                     text = "Save Workout",
                     onClick = {
-                        onAction(ResultAction.OnSaveClick)
+                        googleMap?.snapshot { bmp ->
+                            onAction(ResultAction.OnSaveClick(bmp))
+                        }
                     }
                 )
             }

@@ -12,11 +12,9 @@ import android.os.Build
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.devhjs.runningtracker.R
 import com.devhjs.runningtracker.core.Constants.ACTION_PAUSE_SERVICE
-import com.devhjs.runningtracker.core.Constants.ACTION_SHOW_TRACKING_FRAGMENT
 import com.devhjs.runningtracker.core.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.devhjs.runningtracker.core.Constants.ACTION_STOP_SERVICE
 import com.devhjs.runningtracker.core.Constants.FASTEST_LOCATION_INTERVAL
@@ -26,6 +24,7 @@ import com.devhjs.runningtracker.core.Constants.NOTIFICATION_CHANNEL_NAME
 import com.devhjs.runningtracker.core.Constants.NOTIFICATION_ID
 import com.devhjs.runningtracker.core.Constants.TIMER_UPDATE_INTERVAL
 import com.devhjs.runningtracker.core.util.TrackingUtility
+import com.devhjs.runningtracker.domain.repository.TrackingRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -56,33 +55,28 @@ class TrackingService : LifecycleService() {
     @Inject
     lateinit var baseNotificationBuilder: NotificationCompat.Builder
 
+    @Inject
+    lateinit var trackingRepository: TrackingRepository
+
     lateinit var curNotificationBuilder: NotificationCompat.Builder
-
-    private val timeRunInSeconds = MutableLiveData<Long>()
-
-    companion object {
-        val timeRunInMillis = MutableLiveData<Long>()
-        val isTracking = MutableLiveData<Boolean>()
-        val pathPoints = MutableLiveData<Polylines>()
-    }
-
-    private fun postInitialValues() {
-        isTracking.postValue(false)
-        pathPoints.postValue(mutableListOf())
-        timeRunInMillis.postValue(0L)
-        timeRunInSeconds.postValue(0L)
-    }
 
     override fun onCreate() {
         super.onCreate()
         curNotificationBuilder = baseNotificationBuilder
-        postInitialValues()
+        
+        // Initialize Repository (postInitialValues logic moved to repo implicitly or explicitly here)
+        lifecycleScope.launch {
+            trackingRepository.clearData()
+        }
+        
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        isTracking.observe(this, Observer {
-            updateLocationTracking(it)
-            updateNotificationTrackingState(it)
-        })
+        lifecycleScope.launch {
+            trackingRepository.isTracking.collect { isTracking ->
+                updateLocationTracking(isTracking)
+                updateNotificationTrackingState(isTracking)
+            }
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -117,19 +111,25 @@ class TrackingService : LifecycleService() {
     private var lastSecondTimestamp = 0L
 
     private fun startTimer() {
-        addEmptyPolyline()
-        isTracking.postValue(true)
+        lifecycleScope.launch {
+            trackingRepository.addEmptyPolyline()
+            trackingRepository.setIsTracking(true)
+        }
+        
         timeStarted = System.currentTimeMillis()
         isTimerEnabled = true
+        
         CoroutineScope(Dispatchers.Main).launch {
-            while (isTracking.value!!) {
+            while (isTimerEnabled) { // Check local flag to stop coroutine loop
                 // time difference between now and timeStarted
                 lapTime = System.currentTimeMillis() - timeStarted
-                // post the new lapTime
-                timeRunInMillis.postValue(timeRun + lapTime)
-                if (timeRunInMillis.value!! >= lastSecondTimestamp + 1000L) {
-                    timeRunInSeconds.postValue(timeRunInSeconds.value!! + 1)
+                // update the new lapTime
+                val timeRunInMillis = timeRun + lapTime
+                trackingRepository.updateTimeRunInMillis(timeRunInMillis)
+                
+                if (timeRunInMillis >= lastSecondTimestamp + 1000L) {
                     lastSecondTimestamp += 1000L
+                    updateNotificationTime(timeRunInMillis)
                 }
                 delay(TIMER_UPDATE_INTERVAL)
             }
@@ -137,8 +137,19 @@ class TrackingService : LifecycleService() {
         }
     }
 
+    private fun updateNotificationTime(timeInMillis: Long) {
+        if (!serviceKilled) {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notification = curNotificationBuilder
+                .setContentText(TrackingUtility.getFormattedStopWatchTime(timeInMillis))
+            notificationManager.notify(NOTIFICATION_ID, notification.build())
+        }
+    }
+
     private fun pauseService() {
-        isTracking.postValue(false)
+        lifecycleScope.launch {
+            trackingRepository.setIsTracking(false)
+        }
         isTimerEnabled = false
     }
 
@@ -146,11 +157,12 @@ class TrackingService : LifecycleService() {
         serviceKilled = true
         isFirstRun = true
         pauseService()
-        postInitialValues()
+        lifecycleScope.launch {
+            trackingRepository.clearData()
+        }
         stopForeground(true)
         stopSelf()
     }
-
 
     private fun updateLocationTracking(isTracking: Boolean) {
         if (isTracking) {
@@ -172,10 +184,16 @@ class TrackingService : LifecycleService() {
     val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
             super.onLocationResult(result)
-            if (isTracking.value!!) {
-                result.locations.let { locations ->
+            // Need to check isTracking from repo? 
+            // We can check local var or repo. 
+            // Since updateLocationTracking is reactive to flow, we can assume if this callback fires, we are likely tracking.
+            // But good to double check.
+            if(isTimerEnabled) { // Use local flag for sync safety or repo.isTracking.value
+                 result.locations.let { locations ->
                     for (location in locations) {
-                        addPathPoint(location)
+                        lifecycleScope.launch {
+                            trackingRepository.addPathPoint(location)
+                        }
                         Timber.d("NEW LOCATION: ${location.latitude}, ${location.longitude}")
                     }
                 }
@@ -183,24 +201,9 @@ class TrackingService : LifecycleService() {
         }
     }
 
-    private fun addPathPoint(location: Location?) {
-        location?.let {
-            val pos = LatLng(location.latitude, location.longitude)
-            pathPoints.value?.apply {
-                last().add(pos)
-                pathPoints.postValue(this)
-            }
-        }
-    }
-
-    private fun addEmptyPolyline() = pathPoints.value?.apply {
-        add(mutableListOf())
-        pathPoints.postValue(this)
-    } ?: pathPoints.postValue(mutableListOf(mutableListOf()))
-
     private fun startForegroundService() {
         startTimer()
-        isTracking.postValue(true)
+        // isTracking set in startTimer
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -209,14 +212,6 @@ class TrackingService : LifecycleService() {
         }
 
         startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
-
-        timeRunInSeconds.observe(this, Observer {
-            if (!serviceKilled) {
-                val notification = curNotificationBuilder
-                    .setContentText(TrackingUtility.getFormattedStopWatchTime(it * 1000L))
-                notificationManager.notify(NOTIFICATION_ID, notification.build())
-            }
-        })
     }
 
     private fun updateNotificationTrackingState(isTracking: Boolean) {

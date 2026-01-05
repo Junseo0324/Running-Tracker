@@ -6,5 +6,6 @@ data class Run(
     val avgSpeedInKMH: Float,
     val distanceInMeters: Int,
     val timeInMillis: Long,
-    val caloriesBurned: Int
+    val caloriesBurned: Int,
+    val img: android.graphics.Bitmap? = null
 )

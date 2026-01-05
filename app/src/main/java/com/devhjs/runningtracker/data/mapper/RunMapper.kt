@@ -10,7 +10,8 @@ fun RunEntity.toDomain(): Run {
         avgSpeedInKMH = avgSpeedInKMH,
         distanceInMeters = distanceInMeters,
         timeInMillis = timeInMillis,
-        caloriesBurned = caloriesBurned
+        caloriesBurned = caloriesBurned,
+        img = img
     )
 }
 
@@ -20,7 +21,8 @@ fun Run.toEntity(): RunEntity {
         avgSpeedInKMH = avgSpeedInKMH,
         distanceInMeters = distanceInMeters,
         timeInMillis = timeInMillis,
-        caloriesBurned = caloriesBurned
+        caloriesBurned = caloriesBurned,
+        img = img
     ).also {
         it.id = id
     }

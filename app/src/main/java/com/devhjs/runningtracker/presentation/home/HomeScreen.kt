@@ -121,6 +121,26 @@ fun HomeScreen(
                             onAction(HomeAction.OnStartClick)
                         }
                     )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    androidx.compose.material3.OutlinedButton(
+                        onClick = { onAction(HomeAction.OnHistoryClick) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(
+                            contentColor = RunningGreen
+                        ),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, RunningGreen)
+                    ) {
+                        Text(
+                            text = "저장된 러닝",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(32.dp))
