@@ -33,21 +33,18 @@ import com.devhjs.runningtracker.ui.theme.RunningDarkGrey
 import com.devhjs.runningtracker.ui.theme.RunningGreen
 import com.devhjs.runningtracker.ui.theme.TextGrey
 import com.devhjs.runningtracker.ui.theme.TextWhite
-import com.google.maps.android.compose.CameraPositionState
-import com.google.maps.android.compose.rememberCameraPositionState
 
 
 @Composable
 fun HomeScreen(
     state: HomeState = HomeState(),
-    onAction: (HomeAction) -> Unit = {},
-    cameraPositionState: CameraPositionState
+    onAction: (HomeAction) -> Unit = {}
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         FullScreenMap(
             isMyLocationEnabled = state.isPermissionGranted,
             isMyLocationButtonEnabled = true,
-            cameraPositionState = cameraPositionState
+            currentLocation = state.currentLocation
         )
 
         Column(
@@ -134,7 +131,5 @@ fun HomeScreen(
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
-    HomeScreen(
-        cameraPositionState = rememberCameraPositionState()
-    )
+    HomeScreen()
 }

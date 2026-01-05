@@ -9,10 +9,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.rememberCameraPositionState
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -37,10 +33,6 @@ fun HomeScreenRoot(
 
     val permissionState = rememberMultiplePermissionsState(permissions = permissionsToRequest)
 
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(37.5665, 126.9780), 15f)
-    }
-
     LaunchedEffect(true) {
         viewModel.event.collect { event ->
             when(event) {
@@ -51,14 +43,6 @@ fun HomeScreenRoot(
 
     LaunchedEffect(permissionState.allPermissionsGranted) {
         viewModel.onAction(HomeAction.OnPermissionsResult(permissionState.allPermissionsGranted))
-    }
-
-    LaunchedEffect(state.currentLocation) {
-        state.currentLocation?.let {
-            cameraPositionState.animate(
-                CameraUpdateFactory.newLatLngZoom(it, 15f)
-            )
-        }
     }
 
     HomeScreen(
@@ -75,6 +59,5 @@ fun HomeScreenRoot(
                 else -> viewModel.onAction(action)
             }
         },
-        cameraPositionState = cameraPositionState
     )
 }
