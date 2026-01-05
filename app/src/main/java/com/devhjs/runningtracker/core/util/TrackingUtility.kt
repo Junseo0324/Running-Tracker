@@ -8,34 +8,25 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import androidx.core.content.ContextCompat
-import com.devhjs.runningtracker.service.Polyline
+
 import java.util.concurrent.TimeUnit
 
 object TrackingUtility { 
 
     fun hasLocationPermissions(context: Context): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            return ContextCompat.checkSelfPermission(
-                context,
-                ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(
-                        context,
-                        ACCESS_COARSE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-        }
-        return ContextCompat.checkSelfPermission(
+        // Background permission is NOT required for Foreground Service location tracking.
+        // Also allow if EITHER Fine OR Coarse is granted.
+        val hasFine = ContextCompat.checkSelfPermission(
             context,
             ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(
-                    context,
-                    ACCESS_COARSE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(
-                    context,
-                    ACCESS_BACKGROUND_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
+        ) == PackageManager.PERMISSION_GRANTED
+        
+        val hasCoarse = ContextCompat.checkSelfPermission(
+            context,
+            ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        return hasFine || hasCoarse
     }
 
     fun getFormattedStopWatchTime(ms: Long, includeMillis: Boolean = false): String {
@@ -58,7 +49,7 @@ object TrackingUtility {
                 "${if(milliseconds < 10) "0" else ""}$milliseconds"
     }
 
-    fun calculatePolylineLength(polyline: Polyline): Float {
+    fun calculatePolylineLength(polyline: List<com.google.android.gms.maps.model.LatLng>): Float {
         var distance = 0f
         for (i in 0..polyline.size - 2) {
             val pos1 = polyline[i]

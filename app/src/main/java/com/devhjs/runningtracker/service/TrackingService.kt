@@ -151,7 +151,7 @@ class TrackingService : LifecycleService() {
         stopSelf()
     }
 
-    @SuppressLint("MissingPermission")
+
     private fun updateLocationTracking(isTracking: Boolean) {
         if (isTracking) {
             if (TrackingUtility.hasLocationPermissions(this)) {

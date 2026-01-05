@@ -1,5 +1,6 @@
 package com.devhjs.runningtracker.presentation.run
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,111 +29,33 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.devhjs.runningtracker.core.Constants.ACTION_PAUSE_SERVICE
-import com.devhjs.runningtracker.core.Constants.ACTION_START_OR_RESUME_SERVICE
-import com.devhjs.runningtracker.core.Constants.ACTION_STOP_SERVICE
-import com.devhjs.runningtracker.core.Constants.MAP_ZOOM
 import com.devhjs.runningtracker.core.Constants.POLYLINE_COLOR
 import com.devhjs.runningtracker.core.Constants.POLYLINE_WIDTH
 import com.devhjs.runningtracker.core.util.TrackingUtility
 import com.devhjs.runningtracker.presentation.components.StatsCardItem
-import com.devhjs.runningtracker.presentation.navigation.Screen
-import com.devhjs.runningtracker.presentation.viewmodels.MainViewModel
-import com.devhjs.runningtracker.service.TrackingService
 import com.devhjs.runningtracker.ui.theme.RunningBlack
 import com.devhjs.runningtracker.ui.theme.RunningGreen
 import com.devhjs.runningtracker.ui.theme.TextWhite
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Polyline
-import com.google.maps.android.compose.rememberCameraPositionState
-import java.lang.Math.round
 
 @Composable
+
 fun RunScreen(
-    navController: NavController,
-    runId: String = "-1", // unused for new run
-    viewModel: MainViewModel = hiltViewModel()
+    state: RunState= RunState(),
+    onAction: (RunAction) -> Unit= {},
+    cameraPositionState: CameraPositionState = com.google.maps.android.compose.rememberCameraPositionState()
 ) {
-    val context = LocalContext.current
-    val isTracking by TrackingService.isTracking.observeAsState(false)
-    val pathPoints by TrackingService.pathPoints.observeAsState(listOf())
-    val curTimeInMillis by TrackingService.timeRunInMillis.observeAsState(0L)
-
-    val cameraPositionState = rememberCameraPositionState()
-    val fusedLocationClient = remember { com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(context) }
-
-    // Initial Map Center
-    LaunchedEffect(Unit) {
-        try {
-            val locationResult = fusedLocationClient.lastLocation
-            locationResult.addOnSuccessListener { location ->
-                location?.let {
-                    cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                        LatLng(it.latitude, it.longitude),
-                        MAP_ZOOM
-                    )
-                }
-            }
-        } catch (e: SecurityException) {
-            // Permission not granted or error
-        }
-    }
-
-    // Additional state for "Locked" mode (as seen in screenshot)
-    var isLocked by remember { mutableStateOf(false) }
-
-    // Keep screen on
-    DisposableEffect(Unit) {
-        val window = (context as? android.app.Activity)?.window
-        window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        onDispose {
-            window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
-    }
-
-    // Observe latest point to move camera
-    LaunchedEffect(key1 = pathPoints) {
-        if (pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
-            cameraPositionState.animate(
-                CameraUpdateFactory.newLatLngZoom(
-                    pathPoints.last().last(),
-                    MAP_ZOOM
-                )
-            )
-        }
-    }
-
-    // Calculations
-    val distanceInMeters = if (pathPoints.isNotEmpty()) {
-        pathPoints.fold(0f) { acc, polyline ->
-            acc + TrackingUtility.calculatePolylineLength(polyline)
-        }
-    } else 0f
-    
-    val avgSpeed = round((distanceInMeters / 1000f) / (curTimeInMillis / 1000f / 3600f) * 10) / 10f
-    val caloriesBurned = ((distanceInMeters / 1000f) * 60).toInt() // Dummy formula
-
     Box(modifier = Modifier.fillMaxSize()) {
         // 1. Map Background
         GoogleMap(
@@ -144,7 +67,7 @@ fun RunScreen(
                 myLocationButtonEnabled = false
             )
         ) {
-            pathPoints.forEach { polyline ->
+            state.pathPoints.forEach { polyline ->
                 Polyline(
                     points = polyline,
                     color = Color(POLYLINE_COLOR),
@@ -181,7 +104,7 @@ fun RunScreen(
                         fontSize = 14.sp
                     )
                     Text(
-                        text = TrackingUtility.getFormattedStopWatchTime(curTimeInMillis),
+                        text = TrackingUtility.getFormattedStopWatchTime(state.curTimeInMillis),
                         color = TextWhite,
                         fontSize = 56.sp,
                         fontWeight = FontWeight.Bold
@@ -194,32 +117,28 @@ fun RunScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        StatsCardItem(label = "km", value = String.format("%.2f", distanceInMeters / 1000f))
-                        StatsCardItem(label = "평균 페이스", value = if (avgSpeed > 0) String.format("%.1f", avgSpeed) else "0.0") 
-                        StatsCardItem(label = "kcal", value = "$caloriesBurned")
+                        StatsCardItem(label = "km", value = String.format("%.2f", state.distanceInMeters / 1000f))
+                        StatsCardItem(label = "평균 페이스", value = if (state.avgSpeed > 0) String.format("%.1f", state.avgSpeed) else "0.0") 
+                        StatsCardItem(label = "kcal", value = "${state.caloriesBurned}")
                     }
                 }
             }
 
-            // MIDDLE: Nothing (Map visible)
-
-            // BOTTOM: Controls
-            // If Running: Show Lock & Big Pause Button
-            // If Paused: Show Resume & Stop Buttons
-            
             Box(
-                 modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
+                 modifier = Modifier
+                     .fillMaxWidth()
+                     .padding(bottom = 32.dp),
                  contentAlignment = Alignment.Center
             ) {
-                if (isTracking && !isLocked) {
+                if (state.isTracking && !state.isLocked) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                         // Lock Button
+                        // Lock Button
                         IconButton(
-                            onClick = { isLocked = true },
+                            onClick = { onAction(RunAction.OnToggleLock) },
                             modifier = Modifier
                                 .size(56.dp)
                                 .background(Color.Black.copy(alpha = 0.6f), CircleShape)
@@ -227,11 +146,9 @@ fun RunScreen(
                             Icon(Icons.Default.Lock, contentDescription = "Lock", tint = TextWhite)
                         }
 
-                        // PAUSE Button (Big Green)
+                        // PAUSE Button
                         Button(
-                            onClick = {
-                                sendCommandToService(ACTION_PAUSE_SERVICE, context)
-                            },
+                            onClick = { onAction(RunAction.OnPause) },
                              modifier = Modifier.size(80.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = RunningGreen),
                              shape = RoundedCornerShape(24.dp)
@@ -244,13 +161,12 @@ fun RunScreen(
                              )
                         }
                         
-                         // Dummy spacer to balance layout if needed, or another button
                          Spacer(modifier = Modifier.size(56.dp)) 
                     }
-                } else if (isLocked) {
+                } else if (state.isLocked) {
                      // Unlock Button (Long press logic in real app, click for now)
                      Button(
-                        onClick = { isLocked = false },
+                        onClick = { onAction(RunAction.OnToggleLock) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
@@ -268,9 +184,7 @@ fun RunScreen(
                     ) {
                          // Resume
                         Button(
-                            onClick = {
-                                sendCommandToService(ACTION_START_OR_RESUME_SERVICE, context)
-                            },
+                            onClick = { onAction(RunAction.OnResume) },
                              modifier = Modifier
                                  .weight(1f)
                                  .height(56.dp)
@@ -281,21 +195,18 @@ fun RunScreen(
                              Row(verticalAlignment = Alignment.CenterVertically) {
                                  Icon(Icons.Default.PlayArrow, contentDescription = null, tint = RunningBlack)
                                  Spacer(modifier = Modifier.width(8.dp))
-                                 Text("재개", color = RunningBlack, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                 Text("시작", color = RunningBlack, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                              }
                         }
 
                         // Stop (Finish)
                         Button(
-                            onClick = {
-                                sendCommandToService(ACTION_STOP_SERVICE, context)
-                                navController.navigate(Screen.ResultScreen.route)
-                            },
+                            onClick = { onAction(RunAction.OnFinish) },
                              modifier = Modifier
                                  .weight(1f)
                                  .height(56.dp)
                                  .padding(start = 8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5252)), // Red for stop
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5252)), 
                              shape = RoundedCornerShape(16.dp)
                         ) {
                              Row(verticalAlignment = Alignment.CenterVertically) {
@@ -310,7 +221,7 @@ fun RunScreen(
         }
         
         // Paused Overlay (Dimmed background)
-        if (!isTracking && curTimeInMillis > 0L) {
+        if (!state.isTracking && state.curTimeInMillis > 0L) {
              Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -328,9 +239,9 @@ fun RunScreen(
     }
 }
 
-fun sendCommandToService(action: String, context: android.content.Context) {
-    android.content.Intent(context, TrackingService::class.java).also {
-        it.action = action
-        context.startService(it)
-    }
+
+@Preview(showBackground = true)
+@Composable
+private fun RunScreenPreview() {
+    RunScreen()
 }
