@@ -1,3 +1,7 @@
+
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,9 +11,17 @@ plugins {
     id("kotlin-kapt")
 }
 
+
 android {
     namespace = "com.devhjs.runningtracker"
-    compileSdk = 35
+    compileSdk = 36
+
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(FileInputStream(localPropertiesFile))
+    }
+    val mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: ""
 
     defaultConfig {
         applicationId = "com.devhjs.runningtracker"
@@ -19,6 +31,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {
@@ -57,6 +70,12 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.compose.runtime.livedata)
+    
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
     
     // Hilt
     implementation(libs.hilt.android)
@@ -73,7 +92,11 @@ dependencies {
     implementation(libs.play.services.location)
     
     // Accompanist Permissions
+    // Accompanist Permissions
     implementation(libs.accompanist.permissions)
+    
+    // Timber
+    implementation(libs.timber)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

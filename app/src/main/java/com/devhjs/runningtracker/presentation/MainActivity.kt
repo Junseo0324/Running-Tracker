@@ -7,10 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.devhjs.runningtracker.ui.theme.RunningTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,29 +18,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             RunningTrackerTheme {
-                Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    // Just passing modifier for now if needed, though Navigation manages its own padding usually if it has scaffold
+                    // For now, let's put Navigation inside
+                    androidx.compose.foundation.layout.Box(modifier = Modifier.padding(innerPadding)) {
+                        com.devhjs.runningtracker.presentation.navigation.Navigation()
+                    }
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    RunningTrackerTheme {
-        Greeting("Android")
-    }
-}
