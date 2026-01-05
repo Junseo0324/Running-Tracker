@@ -1,8 +1,5 @@
 package com.devhjs.runningtracker.presentation.run
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,7 +26,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -57,15 +53,14 @@ import com.devhjs.runningtracker.core.Constants.POLYLINE_WIDTH
 import com.devhjs.runningtracker.core.util.TrackingUtility
 import com.devhjs.runningtracker.presentation.components.StatsCardItem
 import com.devhjs.runningtracker.presentation.navigation.Screen
+import com.devhjs.runningtracker.presentation.viewmodels.MainViewModel
 import com.devhjs.runningtracker.service.TrackingService
 import com.devhjs.runningtracker.ui.theme.RunningBlack
-import com.devhjs.runningtracker.ui.theme.RunningDarkGreen
 import com.devhjs.runningtracker.ui.theme.RunningGreen
 import com.devhjs.runningtracker.ui.theme.TextWhite
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -77,7 +72,7 @@ import java.lang.Math.round
 fun RunScreen(
     navController: NavController,
     runId: String = "-1", // unused for new run
-    viewModel: com.devhjs.runningtracker.presentation.viewmodels.MainViewModel = hiltViewModel()
+    viewModel: MainViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val isTracking by TrackingService.isTracking.observeAsState(false)

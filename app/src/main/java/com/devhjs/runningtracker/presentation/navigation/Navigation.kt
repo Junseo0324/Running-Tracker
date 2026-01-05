@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.devhjs.runningtracker.presentation.home.HomeScreen
+import com.devhjs.runningtracker.presentation.home.HomeScreenRoot
 import com.devhjs.runningtracker.presentation.run.ResultScreen
 import com.devhjs.runningtracker.presentation.run.RunScreen
 
@@ -18,7 +18,9 @@ fun Navigation(
         startDestination = Screen.HomeScreen.route
     ) {
         composable(Screen.HomeScreen.route) {
-            HomeScreen(navController = navController)
+            HomeScreenRoot(
+                onNavigate = { route -> navController.navigate(route) }
+            )
         }
         composable(Screen.RunScreen.route) {
             RunScreen(navController = navController)

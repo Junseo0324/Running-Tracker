@@ -21,11 +21,7 @@ import dagger.hilt.android.scopes.ServiceScoped
 @InstallIn(ServiceComponent::class)
 object ServiceModule {
 
-    @ServiceScoped
-    @Provides
-    fun provideFusedLocationProviderClient(
-        @ApplicationContext app: Context
-    ) = LocationServices.getFusedLocationProviderClient(app)
+
 
     @ServiceScoped
     @Provides
