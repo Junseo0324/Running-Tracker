@@ -2,6 +2,7 @@ package com.devhjs.runningtracker.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.devhjs.runningtracker.domain.repository.LocationRepository
 import com.devhjs.runningtracker.presentation.navigation.Screen
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val locationRepository: com.devhjs.runningtracker.domain.repository.LocationRepository
+    private val locationRepository: LocationRepository
 ): ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
