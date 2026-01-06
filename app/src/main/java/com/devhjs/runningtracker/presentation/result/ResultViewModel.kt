@@ -6,9 +6,11 @@ import com.devhjs.runningtracker.core.Constants
 import com.devhjs.runningtracker.core.util.TrackingUtility
 import com.devhjs.runningtracker.domain.model.Run
 import com.devhjs.runningtracker.domain.repository.MainRepository
+import com.devhjs.runningtracker.domain.repository.TrackingRepository
 import com.devhjs.runningtracker.presentation.navigation.Screen
 
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,13 +22,13 @@ import javax.inject.Inject
 @HiltViewModel
 class ResultViewModel @Inject constructor(
     val mainRepository: MainRepository,
-    private val trackingRepository: com.devhjs.runningtracker.domain.repository.TrackingRepository
+    private val trackingRepository: TrackingRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ResultState())
     val state = _state.asStateFlow()
 
-    private val _event = kotlinx.coroutines.flow.MutableSharedFlow<ResultEvent>()
+    private val _event = MutableSharedFlow<ResultEvent>()
     val event = _event.asSharedFlow()
 
     // Assuming ResultScreen is navigated to AFTER tracking is done or just before saving.

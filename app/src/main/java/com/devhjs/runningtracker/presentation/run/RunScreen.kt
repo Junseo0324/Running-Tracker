@@ -48,13 +48,14 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Polyline
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 
 fun RunScreen(
     state: RunState= RunState(),
     onAction: (RunAction) -> Unit= {},
-    cameraPositionState: CameraPositionState = com.google.maps.android.compose.rememberCameraPositionState()
+    cameraPositionState: CameraPositionState = rememberCameraPositionState()
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         // 1. Map Background

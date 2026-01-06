@@ -2,9 +2,12 @@ package com.devhjs.runningtracker.presentation.home
 
 import android.Manifest
 import android.os.Build
+import android.provider.Settings
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -18,7 +21,7 @@ fun HomeScreenRoot(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigate: (String) -> Unit
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     
     val foregroundPermissions = listOf(
@@ -67,8 +70,8 @@ fun HomeScreenRoot(
                             locationManager.isProviderEnabled(android.location.LocationManager.NETWORK_PROVIDER)
 
                     if(!isGpsEnabled) {
-                        android.widget.Toast.makeText(context, "GPS를 켜주세요.", android.widget.Toast.LENGTH_SHORT).show()
-                        val intent = android.content.Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                        Toast.makeText(context, "GPS를 켜주세요.", Toast.LENGTH_SHORT).show()
+                        val intent = android.content.Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                         context.startActivity(intent)
                         return@HomeScreen
                     }

@@ -1,14 +1,12 @@
 package com.devhjs.runningtracker.core.util
 
-import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
-import android.os.Build
 import androidx.core.content.ContextCompat
-
+import com.google.android.gms.maps.model.LatLng
 import java.util.concurrent.TimeUnit
 
 object TrackingUtility { 
@@ -49,7 +47,7 @@ object TrackingUtility {
                 "${if(milliseconds < 10) "0" else ""}$milliseconds"
     }
 
-    fun calculatePolylineLength(polyline: List<com.google.android.gms.maps.model.LatLng>): Float {
+    fun calculatePolylineLength(polyline: List<LatLng>): Float {
         var distance = 0f
         for (i in 0..polyline.size - 2) {
             val pos1 = polyline[i]

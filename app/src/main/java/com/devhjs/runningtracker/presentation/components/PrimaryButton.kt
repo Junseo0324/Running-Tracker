@@ -21,7 +21,6 @@ fun PrimaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isLoading: Boolean = false,
     color: Color = RunningGreen,
     textColor: Color = RunningBlack
 ) {

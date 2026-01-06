@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,29 +23,31 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-import com.devhjs.runningtracker.core.Constants.MAP_ZOOM
 import com.devhjs.runningtracker.core.Constants.POLYLINE_COLOR
 import com.devhjs.runningtracker.core.Constants.POLYLINE_WIDTH
 import com.devhjs.runningtracker.core.util.TrackingUtility
 import com.devhjs.runningtracker.presentation.components.PrimaryButton
 import com.devhjs.runningtracker.presentation.components.StatsCardItem
-
 import com.devhjs.runningtracker.ui.theme.RunningBlack
 import com.devhjs.runningtracker.ui.theme.RunningGreen
 import com.devhjs.runningtracker.ui.theme.TextGrey
 import com.devhjs.runningtracker.ui.theme.TextWhite
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Polyline
@@ -55,12 +58,11 @@ fun ResultScreen(
     state: ResultState= ResultState(),
     onAction: (ResultAction) -> Unit = {}
 ) {
-    val context = LocalContext.current
     val cameraPositionState = rememberCameraPositionState()
 
     LaunchedEffect(key1 = state.pathPoints) {
         if (state.pathPoints.isNotEmpty() && state.pathPoints.flatten().isNotEmpty()) {
-            val boundsBuilder = com.google.android.gms.maps.model.LatLngBounds.Builder()
+            val boundsBuilder = LatLngBounds.Builder()
             state.pathPoints.flatten().forEach { boundsBuilder.include(it) }
             val bounds = boundsBuilder.build()
             
@@ -70,7 +72,7 @@ fun ResultScreen(
         }
     }
 
-    var googleMap: com.google.android.gms.maps.GoogleMap? by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(null) }
+    var googleMap: GoogleMap? by remember { mutableStateOf(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         // 1. Map Background
@@ -78,7 +80,7 @@ fun ResultScreen(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = false),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 350.dp),
+            contentPadding = PaddingValues(bottom = 350.dp),
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = false,
                 myLocationButtonEnabled = false,
@@ -86,7 +88,7 @@ fun ResultScreen(
                 zoomGesturesEnabled = true
             )
         ) {
-            com.google.maps.android.compose.MapEffect(Unit) { map ->
+            MapEffect(Unit) { map ->
                 googleMap = map
             }
              state.pathPoints.forEach { polyline ->

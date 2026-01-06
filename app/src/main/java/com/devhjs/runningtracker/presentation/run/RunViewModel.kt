@@ -4,9 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devhjs.runningtracker.core.Constants
 import com.devhjs.runningtracker.core.util.TrackingUtility
-import com.devhjs.runningtracker.domain.repository.MainRepository
+import com.devhjs.runningtracker.domain.repository.TrackingRepository
 import com.devhjs.runningtracker.presentation.navigation.Screen
-
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,13 +13,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.lang.Math.round
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @HiltViewModel
 class RunViewModel @Inject constructor(
-    private val mainRepository: MainRepository,
-    private val trackingRepository: com.devhjs.runningtracker.domain.repository.TrackingRepository
+    private val trackingRepository: TrackingRepository
 ): ViewModel() {
 
     private val _state = MutableStateFlow(RunState())
@@ -92,7 +90,7 @@ class RunViewModel @Inject constructor(
             }
         } else 0f
         
-        val avgSpeed = round((distanceInMeters / 1000f) / (curTimeInMillis / 1000f / 3600f) * 10) / 10f
+        val avgSpeed = ((distanceInMeters / 1000f) / (curTimeInMillis / 1000f / 3600f) * 10).roundToInt() / 10f
         val caloriesBurned = ((distanceInMeters / 1000f) * 60).toInt()
 
         _state.update {

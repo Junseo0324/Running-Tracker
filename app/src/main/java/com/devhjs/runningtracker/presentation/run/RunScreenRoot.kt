@@ -1,6 +1,8 @@
 package com.devhjs.runningtracker.presentation.run
 
+import android.content.Intent
 import android.location.Location
+import android.view.WindowManager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -11,8 +13,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.devhjs.runningtracker.core.Constants
 import com.devhjs.runningtracker.service.TrackingService
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun RunScreenRoot(
@@ -23,14 +30,14 @@ fun RunScreenRoot(
     val context = LocalContext.current
     var initialLocation by remember { mutableStateOf<LatLng?>(null) }
     
-    val cameraPositionState = com.google.maps.android.compose.rememberCameraPositionState()
+    val cameraPositionState = rememberCameraPositionState()
 
     LaunchedEffect(true) {
         viewModel.event.collect { event ->
             when(event) {
                 is RunEvent.Navigate -> onNavigate(event.route)
                 is RunEvent.ServiceAction -> {
-                    android.content.Intent(context, TrackingService::class.java).also {
+                    Intent(context, TrackingService::class.java).also {
                         it.action = event.action
                         context.startService(it)
                     }
@@ -39,7 +46,7 @@ fun RunScreenRoot(
         }
     }
 
-    val fusedLocationClient = remember { com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(context) }
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     LaunchedEffect(Unit) {
         if(state.pathPoints.isEmpty()) {
             try {
@@ -58,9 +65,9 @@ fun RunScreenRoot(
     LaunchedEffect(initialLocation) {
         initialLocation?.let {
             if(state.pathPoints.isEmpty()) {
-                cameraPositionState.position = com.google.android.gms.maps.model.CameraPosition.fromLatLngZoom(
+                cameraPositionState.position = CameraPosition.fromLatLngZoom(
                     it,
-                    com.devhjs.runningtracker.core.Constants.MAP_ZOOM
+                    Constants.MAP_ZOOM
                 )
             }
         }
@@ -70,7 +77,7 @@ fun RunScreenRoot(
     LaunchedEffect(key1 = state.currentLocation) {
         state.currentLocation?.let {
             cameraPositionState.animate(
-                com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom(it, com.devhjs.runningtracker.core.Constants.MAP_ZOOM)
+                CameraUpdateFactory.newLatLngZoom(it, Constants.MAP_ZOOM)
             )
         }
     }
@@ -78,9 +85,9 @@ fun RunScreenRoot(
     // Keep screen on
     DisposableEffect(Unit) {
         val window = (context as? android.app.Activity)?.window
-        window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         onDispose {
-            window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
     }
 
