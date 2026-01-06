@@ -69,7 +69,20 @@ class TrackingService : LifecycleService() {
         
         // Initialize Repository (postInitialValues logic moved to repo implicitly or explicitly here)
         lifecycleScope.launch {
-            trackingRepository.clearData()
+            // Try to restore state first
+            trackingRepository.restoreState()
+            
+            // If we restored data, sync local variables
+            val restoredTime = trackingRepository.timeRunInMillis.value
+            if (restoredTime > 0L) {
+                timeRun = restoredTime
+                isFirstRun = false
+                // Note: We don't automatically resume the timer here. User has to press start/resume.
+                // Or if we want START_STICKY to auto-resume, we'd need to know if we were running.
+                // For now, let's just restore data so it's not lost.
+            } else {
+                 trackingRepository.clearData()
+            }
         }
         
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
@@ -104,7 +117,8 @@ class TrackingService : LifecycleService() {
                 }
             }
         }
-        return super.onStartCommand(intent, flags, startId)
+        super.onStartCommand(intent, flags, startId)
+        return START_STICKY
     }
 
     private var isTimerEnabled = false
@@ -133,6 +147,13 @@ class TrackingService : LifecycleService() {
                 if (timeRunInMillis >= lastSecondTimestamp + 1000L) {
                     lastSecondTimestamp += 1000L
                     updateNotificationTime(timeRunInMillis)
+                    
+                    // Persist state every 5 seconds (approx) for crash recovery
+                    if (lastSecondTimestamp % 5000L == 0L) {
+                        lifecycleScope.launch {
+                            trackingRepository.persistState()
+                        }
+                    }
                 }
                 delay(TIMER_UPDATE_INTERVAL)
             }

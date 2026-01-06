@@ -14,4 +14,6 @@ interface TrackingRepository {
     suspend fun addEmptyPolyline()
     suspend fun updateTimeRunInMillis(time: Long)
     suspend fun clearData()
+    suspend fun persistState()
+    suspend fun restoreState()
 }
