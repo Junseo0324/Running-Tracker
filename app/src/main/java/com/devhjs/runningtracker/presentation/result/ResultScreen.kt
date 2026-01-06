@@ -80,7 +80,7 @@ fun ResultScreen(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = false),
-            contentPadding = PaddingValues(bottom = 350.dp),
+            contentPadding = PaddingValues(top = 64.dp, bottom = 400.dp, start = 16.dp, end = 16.dp),
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = false,
                 myLocationButtonEnabled = false,
@@ -101,38 +101,32 @@ fun ResultScreen(
         }
 
         // 2. Top Bar
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 48.dp, start = 16.dp, end = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .padding(top = 48.dp, start = 16.dp, end = 16.dp)
         ) {
             IconButton(
                 onClick = { 
                      onAction(ResultAction.OnDiscardClick)
                 },
-                modifier = Modifier.background(RunningBlack.copy(alpha=0.5f), RoundedCornerShape(12.dp))
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .background(RunningBlack.copy(alpha=0.5f), RoundedCornerShape(12.dp))
             ) {
                 Icon(Icons.Default.Close, contentDescription = "Close", tint = TextWhite)
             }
             
             Text(
-                text = "Workout Summary", 
+                text = "운동 결과", 
                 color = TextWhite, 
                 fontWeight = FontWeight.Bold, 
                 fontSize = 20.sp,
                 modifier = Modifier
+                    .align(Alignment.Center)
                     .background(RunningBlack.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
                     .padding(horizontal = 8.dp, vertical = 4.dp)
             )
-
-            IconButton(
-                onClick = { /* Share logic */ },
-                 modifier = Modifier.background(RunningBlack.copy(alpha=0.5f), RoundedCornerShape(12.dp))
-            ) {
-                Icon(Icons.Default.Share, contentDescription = "Share", tint = TextWhite)
-            }
         }
 
         // 3. Bottom Summary Card

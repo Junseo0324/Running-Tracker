@@ -96,7 +96,11 @@ class RunViewModel @Inject constructor(
             }
         } else 0f
         
-        val avgSpeed = ((distanceInMeters / 1000f) / (curTimeInMillis / 1000f / 3600f) * 10).roundToInt() / 10f
+        val avgSpeed = if (curTimeInMillis > 0L) {
+             ((distanceInMeters / 1000f) / (curTimeInMillis / 1000f / 3600f) * 10).roundToInt() / 10f
+        } else {
+            0f
+        }
         val caloriesBurned = ((distanceInMeters / 1000f) * 60).toInt()
 
         _state.update {

@@ -44,7 +44,7 @@ class TrackingRepositoryImpl @Inject constructor(
         location?.let {
             val pos = LatLng(location.latitude, location.longitude)
             _pathPoints.update { currentPoints ->
-                val newPoints = currentPoints.toMutableList()
+                val newPoints = currentPoints.map { it.toMutableList() }.toMutableList()
                 if (newPoints.isEmpty()) {
                     newPoints.add(mutableListOf())
                 }

@@ -7,5 +7,6 @@ import com.google.android.gms.maps.model.LatLng
 data class HomeState(
     val isPermissionGranted: Boolean = false,
     val currentLocation: LatLng? = null,
-    val isLocationLoading: Boolean = false
+    val isLocationLoading: Boolean = false,
+    val isGpsEnabled: Boolean = true
 )

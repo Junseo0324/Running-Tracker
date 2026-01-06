@@ -14,9 +14,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import com.devhjs.runningtracker.domain.repository.TrackingRepository
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val locationRepository: LocationRepository
+    private val locationRepository: LocationRepository,
+    private val trackingRepository: TrackingRepository
 ): ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -24,6 +27,14 @@ class HomeViewModel @Inject constructor(
 
     private val _event = MutableSharedFlow<HomeEvent>()
     val event = _event.asSharedFlow()
+    
+    init {
+        viewModelScope.launch {
+            trackingRepository.isGpsEnabled.collect { isGpsEnabled ->
+                _state.update { it.copy(isGpsEnabled = isGpsEnabled) }
+            }
+        }
+    }
 
     fun onAction(action: HomeAction) {
         when(action) {

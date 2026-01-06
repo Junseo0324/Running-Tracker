@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GpsFixed
+import androidx.compose.material.icons.filled.GpsOff
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -63,26 +65,26 @@ fun HomeScreen(
                         .padding(bottom = 16.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
-                     Box(
+                    Box(
                         modifier = Modifier
                             .background(
-                                RunningDarkGrey.copy(alpha = 0.8f),
+                                if (state.isGpsEnabled) RunningDarkGrey.copy(alpha = 0.8f) else Color.Red.copy(alpha = 0.8f),
                                 shape = RoundedCornerShape(20.dp)
                             )
                             .padding(horizontal = 12.dp, vertical = 6.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
-                                imageVector = Icons.Default.GpsFixed,
+                                imageVector = if (state.isGpsEnabled) Icons.Default.GpsFixed else Icons.Default.GpsOff,
                                 contentDescription = null,
-                                tint = RunningGreen,
+                                tint = if (state.isGpsEnabled) RunningGreen else Color.White,
                                 modifier = Modifier
                                     .width(16.dp)
                                     .height(16.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "GPS 연결됨",
+                                text = if (state.isGpsEnabled) "GPS 연결됨" else "GPS 연결 안 됨",
                                 color = TextWhite,
                                 style = MaterialTheme.typography.labelMedium
                             )
