@@ -1,23 +1,24 @@
 package com.devhjs.runningtracker.data.repository
 
+import android.content.Context
 import android.location.Location
 import com.devhjs.runningtracker.domain.repository.TrackingRepository
-import com.devhjs.runningtracker.service.Polyline
 import com.devhjs.runningtracker.service.Polylines
 import com.google.android.gms.maps.model.LatLng
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 @Singleton
 class TrackingRepositoryImpl @Inject constructor(
-    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context
+    @ApplicationContext private val context: Context
 ) : TrackingRepository {
 
     private val _isTracking = MutableStateFlow(false)
@@ -88,7 +89,7 @@ class TrackingRepositoryImpl @Inject constructor(
                 pathPoints = serializablePathPoints
             )
             val jsonString = Json.encodeToString(state)
-            context.openFileOutput(TEMP_RUN_FILE, android.content.Context.MODE_PRIVATE).use {
+            context.openFileOutput(TEMP_RUN_FILE, Context.MODE_PRIVATE).use {
                 it.write(jsonString.toByteArray())
             }
         } catch (e: Exception) {
@@ -117,13 +118,13 @@ class TrackingRepositoryImpl @Inject constructor(
         private const val TEMP_RUN_FILE = "temp_run_state.json"
     }
 
-    @kotlinx.serialization.Serializable
+    @Serializable
     private data class TempRunState(
         val timeInMillis: Long,
         val pathPoints: List<List<SerializableLatLng>>
     )
     
-    @kotlinx.serialization.Serializable
+    @Serializable
     private data class SerializableLatLng(
         val lat: Double,
         val lng: Double
