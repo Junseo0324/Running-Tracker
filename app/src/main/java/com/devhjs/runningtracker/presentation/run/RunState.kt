@@ -12,5 +12,6 @@ data class RunState(
     val distanceInMeters: Float = 0f,
     val caloriesBurned: Int = 0,
     val avgSpeed: Float = 0f,
-    val currentLocation: LatLng? = null
+    val currentLocation: LatLng? = null,
+    val isGpsEnabled: Boolean = true
 )

@@ -28,6 +28,13 @@ class TrackingRepositoryImpl @Inject constructor(
 
     private val _timeRunInMillis = MutableStateFlow(0L)
     override val timeRunInMillis: StateFlow<Long> = _timeRunInMillis.asStateFlow()
+    
+    private val _isGpsEnabled = MutableStateFlow(true)
+    override val isGpsEnabled: StateFlow<Boolean> = _isGpsEnabled.asStateFlow()
+
+    override suspend fun setGpsEnabled(isEnabled: Boolean) {
+        _isGpsEnabled.value = isEnabled
+    }
 
     override suspend fun setIsTracking(isTracking: Boolean) {
         _isTracking.value = isTracking

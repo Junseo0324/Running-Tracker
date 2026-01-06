@@ -54,6 +54,12 @@ class RunViewModel @Inject constructor(
                 updateStats()               
             }
         }
+        
+        viewModelScope.launch {
+            trackingRepository.isGpsEnabled.collect { isGpsEnabled ->
+                _state.update { it.copy(isGpsEnabled = isGpsEnabled) }
+            }
+        }
     }
 
     fun onAction(action: RunAction) {

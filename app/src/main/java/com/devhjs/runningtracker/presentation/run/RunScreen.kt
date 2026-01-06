@@ -256,6 +256,23 @@ fun RunScreen(
                 )
             }
         }
+
+        // GPS Disabled Warning
+        if (!state.isGpsEnabled) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Red.copy(alpha = 0.9f))
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "GPS가 꺼져있습니다. 위치 추적을 위해 GPS를 켜주세요.",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
     }
 }
 

@@ -16,4 +16,7 @@ interface TrackingRepository {
     suspend fun clearData()
     suspend fun persistState()
     suspend fun restoreState()
+    
+    val isGpsEnabled: StateFlow<Boolean>
+    suspend fun setGpsEnabled(isEnabled: Boolean)
 }
