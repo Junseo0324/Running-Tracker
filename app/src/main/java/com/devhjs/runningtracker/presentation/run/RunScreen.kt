@@ -1,6 +1,8 @@
 package com.devhjs.runningtracker.presentation.run
 
 
+import android.view.WindowManager
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,9 +31,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,6 +61,21 @@ fun RunScreen(
     onAction: (RunAction) -> Unit= {},
     cameraPositionState: CameraPositionState = rememberCameraPositionState()
 ) {
+    val context = LocalContext.current
+    
+    DisposableEffect(state.isTracking) {
+        val window = (context as? ComponentActivity)?.window
+        if (state.isTracking) {
+             window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+        
+        onDispose {
+             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         // 1. Map Background
         GoogleMap(
