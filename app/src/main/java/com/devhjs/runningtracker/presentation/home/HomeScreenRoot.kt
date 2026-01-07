@@ -42,6 +42,9 @@ fun HomeScreenRoot(
         viewModel.event.collect { event ->
             when(event) {
                 is HomeEvent.Navigate -> onNavigate(event.route)
+                is HomeEvent.ShowBatteryLowWarning -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                }
             }
         }
     }

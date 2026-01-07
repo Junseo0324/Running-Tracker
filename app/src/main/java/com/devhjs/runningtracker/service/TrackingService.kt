@@ -40,6 +40,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import com.devhjs.runningtracker.data.connectivity.BatteryMonitor
+import com.devhjs.runningtracker.domain.repository.MainRepository
+import com.devhjs.runningtracker.domain.model.Run
+import kotlinx.coroutines.flow.combine
+import kotlin.math.roundToInt
 
 typealias Polyline = MutableList<LatLng>
 typealias Polylines = MutableList<Polyline>
@@ -62,6 +67,12 @@ class TrackingService : LifecycleService() {
     @Inject
     lateinit var mainActivityPendingIntent: PendingIntent
 
+    @Inject
+    lateinit var batteryMonitor: BatteryMonitor
+
+    @Inject
+    lateinit var mainRepository: MainRepository
+
     lateinit var curNotificationBuilder: NotificationCompat.Builder
 
     private val gpsBroadcastReceiver = object : android.content.BroadcastReceiver() {
@@ -75,6 +86,7 @@ class TrackingService : LifecycleService() {
             }
         }
     }
+
 
     override fun onCreate() {
         super.onCreate()
@@ -102,21 +114,71 @@ class TrackingService : LifecycleService() {
             if (restoredTime > 0L) {
                 timeRun = restoredTime
                 isFirstRun = false
-                // Note: We don't automatically resume the timer here. User has to press start/resume.
-                // Or if we want START_STICKY to auto-resume, we'd need to know if we were running.
-                // For now, let's just restore data so it's not lost.
             } else {
                  trackingRepository.clearData()
             }
         }
         
-        // Removed redundant fusedLocationProviderClient initialization (already injected)
-
         lifecycleScope.launch {
             trackingRepository.isTracking.collect { isTracking ->
                 updateLocationTracking(isTracking)
                 updateNotificationTrackingState(isTracking)
             }
+        }
+
+        lifecycleScope.launch {
+             combine(
+                 trackingRepository.isTracking,
+                 batteryMonitor.getBatteryStatusFlow()
+             ) { isTracking, batteryStatus ->
+                 isTracking && batteryStatus.percentage <= 20
+             }.collect { shouldStop ->
+                 if (shouldStop) {
+                     stopRunDueToLowBattery()
+                 }
+             }
+        }
+    }
+
+    private fun stopRunDueToLowBattery() {
+        pauseService()
+        
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle("배터리 부족")
+            .setContentText("배터리가 20% 이하로 떨어져 운동이 자동으로 저장되었습니다.")
+            .setAutoCancel(true)
+            .build()
+        notificationManager.notify(NOTIFICATION_ID + 1, notification)
+
+        lifecycleScope.launch {
+             val pathPoints = trackingRepository.pathPoints.value
+             val curTimeInMillis = trackingRepository.timeRunInMillis.value
+             
+             // Calculate stats
+             var distanceInMeters = 0f
+             for(polyline in pathPoints) {
+                 distanceInMeters += TrackingUtility.calculatePolylineLength(polyline)
+             }
+             val avgSpeed = if (curTimeInMillis > 0L) {
+                 ((distanceInMeters / 1000f) / (curTimeInMillis / 1000f / 3600f) * 10).roundToInt() / 10f
+             } else {
+                 0f
+             }
+             val caloriesBurned = ((distanceInMeters / 1000f) * 60).toInt()
+             
+             val run = Run(
+                 timestamp = System.currentTimeMillis(),
+                 avgSpeedInKMH = avgSpeed,
+                 distanceInMeters = distanceInMeters.toInt(),
+                 timeInMillis = curTimeInMillis,
+                 caloriesBurned = caloriesBurned,
+                 img = null
+             )
+             
+             mainRepository.insertRun(run)
+             killService()
         }
     }
     
