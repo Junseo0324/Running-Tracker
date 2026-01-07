@@ -1,7 +1,9 @@
 package com.devhjs.runningtracker.core.di
 
+import com.devhjs.runningtracker.data.repository.BatteryRepositoryImpl
 import com.devhjs.runningtracker.data.repository.MainRepositoryImpl
 import com.devhjs.runningtracker.data.repository.TrackingRepositoryImpl
+import com.devhjs.runningtracker.domain.repository.BatteryRepository
 import com.devhjs.runningtracker.domain.repository.MainRepository
 import com.devhjs.runningtracker.domain.repository.TrackingRepository
 import dagger.Binds
@@ -25,5 +27,11 @@ abstract class RepositoryModule {
     abstract fun bindTrackingRepository(
         trackingRepositoryImpl: TrackingRepositoryImpl
     ): TrackingRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindBatteryRepository(
+        batteryRepositoryImpl: BatteryRepositoryImpl
+    ): BatteryRepository
 
 }

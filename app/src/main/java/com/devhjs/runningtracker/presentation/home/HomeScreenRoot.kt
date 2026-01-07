@@ -1,6 +1,9 @@
 package com.devhjs.runningtracker.presentation.home
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.location.LocationManager
 import android.os.Build
 import android.provider.Settings
 import android.widget.Toast
@@ -68,13 +71,13 @@ fun HomeScreenRoot(
             when(action) {
                 HomeAction.OnStartClick -> {
                     // 1. Check GPS
-                    val locationManager = context.getSystemService(android.content.Context.LOCATION_SERVICE) as android.location.LocationManager
-                    val isGpsEnabled = locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER) ||
-                            locationManager.isProviderEnabled(android.location.LocationManager.NETWORK_PROVIDER)
+                    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                    val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                            locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
                     if(!isGpsEnabled) {
                         Toast.makeText(context, "GPS를 켜주세요.", Toast.LENGTH_SHORT).show()
-                        val intent = android.content.Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                         context.startActivity(intent)
                         return@HomeScreen
                     }

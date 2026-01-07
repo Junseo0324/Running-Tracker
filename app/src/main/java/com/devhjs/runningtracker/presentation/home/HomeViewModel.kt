@@ -16,14 +16,14 @@ import javax.inject.Inject
 
 import com.devhjs.runningtracker.domain.repository.TrackingRepository
 
-import com.devhjs.runningtracker.data.connectivity.BatteryMonitor
+import com.devhjs.runningtracker.domain.repository.BatteryRepository
 import kotlinx.coroutines.flow.first
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     private val trackingRepository: TrackingRepository,
-    private val batteryMonitor: BatteryMonitor
+    private val batteryRepository: BatteryRepository
 ): ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -50,7 +50,7 @@ class HomeViewModel @Inject constructor(
             }
             HomeAction.OnStartClick -> {
                 viewModelScope.launch {
-                    val batteryStatus = batteryMonitor.getBatteryStatusFlow().first()
+                    val batteryStatus = batteryRepository.getBatteryStatus().first()
                     if (batteryStatus.percentage <= 30) {
                         _event.emit(HomeEvent.ShowBatteryLowWarning("배터리가 30% 이하입니다. 운동 중 전원이 꺼질 수 있습니다."))
                     }

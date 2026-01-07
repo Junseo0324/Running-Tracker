@@ -40,7 +40,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import com.devhjs.runningtracker.data.connectivity.BatteryMonitor
+import com.devhjs.runningtracker.domain.repository.BatteryRepository
 import com.devhjs.runningtracker.domain.repository.MainRepository
 import com.devhjs.runningtracker.domain.model.Run
 import kotlinx.coroutines.flow.combine
@@ -68,7 +68,7 @@ class TrackingService : LifecycleService() {
     lateinit var mainActivityPendingIntent: PendingIntent
 
     @Inject
-    lateinit var batteryMonitor: BatteryMonitor
+    lateinit var batteryRepository: BatteryRepository
 
     @Inject
     lateinit var mainRepository: MainRepository
@@ -129,7 +129,7 @@ class TrackingService : LifecycleService() {
         lifecycleScope.launch {
              combine(
                  trackingRepository.isTracking,
-                 batteryMonitor.getBatteryStatusFlow()
+                 batteryRepository.getBatteryStatus()
              ) { isTracking, batteryStatus ->
                  isTracking && batteryStatus.percentage <= 20
              }.collect { shouldStop ->
