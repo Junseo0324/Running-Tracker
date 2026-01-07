@@ -1,14 +1,13 @@
 package com.devhjs.runningtracker.service
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
 import android.content.Intent
-import android.location.Location
+import android.content.IntentFilter
+import android.location.LocationManager
 import android.os.Build
 import android.os.Looper
 import androidx.annotation.RequiresApi
@@ -32,7 +31,6 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,14 +58,17 @@ class TrackingService : LifecycleService() {
 
     @Inject
     lateinit var trackingRepository: TrackingRepository
+    
+    @Inject
+    lateinit var mainActivityPendingIntent: PendingIntent
 
     lateinit var curNotificationBuilder: NotificationCompat.Builder
 
     private val gpsBroadcastReceiver = object : android.content.BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == android.location.LocationManager.PROVIDERS_CHANGED_ACTION) {
-                val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as android.location.LocationManager
-                val isGpsEnabled = locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)
+            if (intent.action == LocationManager.PROVIDERS_CHANGED_ACTION) {
+                val locationManager = context.getSystemService(LOCATION_SERVICE) as LocationManager
+                val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 lifecycleScope.launch {
                     trackingRepository.setGpsEnabled(isGpsEnabled)
                 }
@@ -80,11 +81,13 @@ class TrackingService : LifecycleService() {
         curNotificationBuilder = baseNotificationBuilder
         
         // Register GPS Status Receiver
-        registerReceiver(gpsBroadcastReceiver, android.content.IntentFilter(android.location.LocationManager.PROVIDERS_CHANGED_ACTION))
+        registerReceiver(gpsBroadcastReceiver,
+            IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+        )
         
         // Initial GPS Check
-        val locationManager = getSystemService(Context.LOCATION_SERVICE) as android.location.LocationManager
-        val isGpsEnabled = locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)
+        val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         lifecycleScope.launch {
             trackingRepository.setGpsEnabled(isGpsEnabled)
         }
@@ -107,7 +110,7 @@ class TrackingService : LifecycleService() {
             }
         }
         
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        // Removed redundant fusedLocationProviderClient initialization (already injected)
 
         lifecycleScope.launch {
             trackingRepository.isTracking.collect { isTracking ->
@@ -282,14 +285,20 @@ class TrackingService : LifecycleService() {
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        curNotificationBuilder.javaClass.getDeclaredField("mActions").apply {
-            isAccessible = true
-            set(curNotificationBuilder, ArrayList<NotificationCompat.Action>())
-        }
+        // Reflection removed. Recreating builder instead.
+        val currentTimeInMillis = trackingRepository.timeRunInMillis.value
+        val formattedTime = TrackingUtility.getFormattedStopWatchTime(currentTimeInMillis)
 
+        curNotificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            .setAutoCancel(false)
+            .setOngoing(true)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle("Running Tracker")
+            .setContentText(formattedTime)
+            .setContentIntent(mainActivityPendingIntent)
+            .addAction(R.drawable.ic_launcher_foreground, notificationActionText, pendingIntent)
+        
         if (!serviceKilled) {
-            curNotificationBuilder = baseNotificationBuilder
-                .addAction(R.drawable.ic_launcher_foreground, notificationActionText, pendingIntent)
             notificationManager.notify(NOTIFICATION_ID, curNotificationBuilder.build())
         }
     }

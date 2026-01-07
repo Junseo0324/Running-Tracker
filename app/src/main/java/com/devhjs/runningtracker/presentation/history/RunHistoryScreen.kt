@@ -173,7 +173,7 @@ fun RunItemCard(run: Run) {
             ) {
                 run.img?.let {
                     Image(
-                        bitmap = it.asImageBitmap(),
+                        bitmap = TrackingUtility.bytesToBitmap(it).asImageBitmap(),
                         contentDescription = "Run Path",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop

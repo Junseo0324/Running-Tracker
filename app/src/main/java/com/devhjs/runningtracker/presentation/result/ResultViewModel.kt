@@ -103,7 +103,7 @@ class ResultViewModel @Inject constructor(
             distanceInMeters = currentState.distanceInMeters.toInt(),
             timeInMillis = currentState.timeInMillis,
             caloriesBurned = currentState.caloriesBurned,
-            img = bitmap
+            img = bitmap?.let { TrackingUtility.bitmapToBytes(it) }
         )
         
         viewModelScope.launch {

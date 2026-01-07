@@ -1,7 +1,5 @@
 package com.devhjs.runningtracker.domain.model
 
-import android.graphics.Bitmap
-
 data class Run(
     val id: Int? = null,
     val timestamp: Long,
@@ -9,5 +7,5 @@ data class Run(
     val distanceInMeters: Int,
     val timeInMillis: Long,
     val caloriesBurned: Int,
-    val img: Bitmap? = null
+    val img: ByteArray? = null
 )

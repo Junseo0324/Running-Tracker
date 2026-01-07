@@ -12,8 +12,6 @@ import java.util.concurrent.TimeUnit
 object TrackingUtility { 
 
     fun hasLocationPermissions(context: Context): Boolean {
-        // Background permission is NOT required for Foreground Service location tracking.
-        // Also allow if EITHER Fine OR Coarse is granted.
         val hasFine = ContextCompat.checkSelfPermission(
             context,
             ACCESS_FINE_LOCATION
@@ -63,5 +61,15 @@ object TrackingUtility {
             distance += result[0]
         }
         return distance
+    }
+
+    fun bytesToBitmap(bytes: ByteArray): android.graphics.Bitmap {
+        return android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+    }
+
+    fun bitmapToBytes(bmp: android.graphics.Bitmap): ByteArray {
+        val outputStream = java.io.ByteArrayOutputStream()
+        bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, outputStream)
+        return outputStream.toByteArray()
     }
 }
