@@ -12,11 +12,19 @@ import androidx.compose.ui.Modifier
 import com.devhjs.runningtracker.presentation.navigation.Navigation
 import com.devhjs.runningtracker.ui.theme.RunningTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var gpsStatusMonitor: com.devhjs.runningtracker.data.connectivity.GpsStatusMonitor
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        gpsStatusMonitor.startMonitoring()
+        
         enableEdgeToEdge()
         setContent {
             RunningTrackerTheme {
@@ -28,6 +36,12 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        gpsStatusMonitor.stopMonitoring()
+    }
 }
+
 
 

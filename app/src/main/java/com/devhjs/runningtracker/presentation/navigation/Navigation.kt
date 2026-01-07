@@ -29,7 +29,15 @@ fun Navigation(
         }
         composable(Screen.ResultScreen.route) {
             ResultScreenRoot(
-                onNavigate = { route -> navController.navigate(route) }
+                onNavigate = { route -> 
+                    if(route == Screen.HomeScreen.route) {
+                        navController.navigate(route) {
+                            popUpTo(Screen.HomeScreen.route) { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate(route)
+                    }
+                }
             )
         }
         composable(Screen.RunHistoryScreen.route) {
