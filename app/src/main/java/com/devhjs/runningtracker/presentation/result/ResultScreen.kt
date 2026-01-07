@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -30,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -65,19 +65,23 @@ fun ResultScreen(
 
     val cameraPositionState = rememberCameraPositionState()
 
-    LaunchedEffect(key1 = state.pathPoints) {
-        if (state.pathPoints.isNotEmpty() && state.pathPoints.flatten().isNotEmpty()) {
+    val localDensity = androidx.compose.ui.platform.LocalDensity.current
+    var googleMap: GoogleMap? by remember { mutableStateOf(null) }
+    var bottomCardHeight by remember { mutableStateOf(0.dp) }
+
+    LaunchedEffect(key1 = state.pathPoints, key2 = bottomCardHeight) {
+        if (state.pathPoints.isNotEmpty() && state.pathPoints.flatten().isNotEmpty() && bottomCardHeight > 0.dp) {
             val boundsBuilder = LatLngBounds.Builder()
             state.pathPoints.flatten().forEach { boundsBuilder.include(it) }
             val bounds = boundsBuilder.build()
             
+            val paddingPx = with(localDensity) { 64.dp.toPx() }.toInt()
+            
             cameraPositionState.animate(
-                 CameraUpdateFactory.newLatLngBounds(bounds, 100)
+                 CameraUpdateFactory.newLatLngBounds(bounds, paddingPx)
             )
         }
     }
-
-    var googleMap: GoogleMap? by remember { mutableStateOf(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         // 1. Map Background
@@ -85,7 +89,7 @@ fun ResultScreen(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = false),
-            contentPadding = PaddingValues(top = 64.dp, bottom = 400.dp, start = 16.dp, end = 16.dp),
+            contentPadding = PaddingValues(top = 64.dp, bottom = bottomCardHeight + 50.dp, start = 16.dp, end = 16.dp),
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = false,
                 myLocationButtonEnabled = false,
@@ -139,6 +143,9 @@ fun ResultScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
+                .onGloballyPositioned { coordinates ->
+                    bottomCardHeight = with(localDensity) { coordinates.size.height.toDp() }
+                }
         ) {
             Card(
                 modifier = Modifier
