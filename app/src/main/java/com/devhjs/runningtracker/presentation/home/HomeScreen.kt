@@ -148,7 +148,11 @@ fun HomeScreen(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            com.devhjs.runningtracker.presentation.components.AdMobBanner()
+            
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

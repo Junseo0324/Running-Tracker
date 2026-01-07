@@ -58,6 +58,11 @@ fun ResultScreen(
     state: ResultState= ResultState(),
     onAction: (ResultAction) -> Unit = {}
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    LaunchedEffect(Unit) {
+        com.devhjs.runningtracker.presentation.util.AdHelper.showInterstitial(context)
+    }
+
     val cameraPositionState = rememberCameraPositionState()
 
     LaunchedEffect(key1 = state.pathPoints) {
@@ -129,57 +134,64 @@ fun ResultScreen(
             )
         }
 
-        // 3. Bottom Summary Card
-        Card(
+        // 3. Bottom Summary Card & Ad
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(16.dp),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = RunningBlack.copy(alpha = 0.95f))
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = RunningBlack.copy(alpha = 0.95f))
             ) {
-                Text(text = "TOTAL DISTANCE", color = TextGrey, fontSize = 14.sp)
-                Text(
-                    text = "${String.format("%.2f", state.distanceInMeters / 1000f)} km", 
-                    color = RunningGreen, 
-                    fontSize = 48.sp, 
-                    fontWeight = FontWeight.Bold
-                )
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                // Stats Grid
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    StatsCardItem(label = "Time", value = TrackingUtility.getFormattedStopWatchTime(state.timeInMillis))
-                    StatsCardItem(label = "Avg Pace", value = "${String.format("%.2f", state.avgSpeed)}'")
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    StatsCardItem(label = "Calories", value = "${state.caloriesBurned}")
-                    StatsCardItem(label = "Elevation", value = "0 m") // Dummy
-                }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                PrimaryButton(
-                    text = "Save Workout",
-                    onClick = {
-                        googleMap?.snapshot { bmp ->
-                            onAction(ResultAction.OnSaveClick(bmp))
-                        }
+                    Text(text = "TOTAL DISTANCE", color = TextGrey, fontSize = 14.sp)
+                    Text(
+                        text = "${String.format("%.2f", state.distanceInMeters / 1000f)} km", 
+                        color = RunningGreen, 
+                        fontSize = 48.sp, 
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    // Stats Grid
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        StatsCardItem(label = "Time", value = TrackingUtility.getFormattedStopWatchTime(state.timeInMillis))
+                        StatsCardItem(label = "Avg Pace", value = "${String.format("%.2f", state.avgSpeed)}'")
                     }
-                )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        StatsCardItem(label = "Calories", value = "${state.caloriesBurned}")
+                        StatsCardItem(label = "Elevation", value = "0 m") // Dummy
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    PrimaryButton(
+                        text = "Save Workout",
+                        onClick = {
+                            onAction(ResultAction.OnSaveClick)
+                        }
+                    )
+                }
             }
+            
+            com.devhjs.runningtracker.presentation.components.AdMobBanner(
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
         }
     }
 }

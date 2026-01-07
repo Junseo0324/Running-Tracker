@@ -87,14 +87,15 @@ class ResultViewModel @Inject constructor(
                     _event.emit(ResultEvent.Navigate(Screen.HomeScreen.route))
                 }
             }
-            is ResultAction.OnSaveClick -> {
-                saveRun(action.bitmap)
+            ResultAction.OnSaveClick -> {
+                saveRun()
             }
         }
     }
 
-    private fun saveRun(bitmap: android.graphics.Bitmap?) {
+    private fun saveRun() {
         val currentState = _state.value
+        val mapBitmap = generatePolylineBitmap()
         val timestamp = Calendar.getInstance().timeInMillis
         
         val run = Run(
@@ -103,7 +104,7 @@ class ResultViewModel @Inject constructor(
             distanceInMeters = currentState.distanceInMeters.toInt(),
             timeInMillis = currentState.timeInMillis,
             caloriesBurned = currentState.caloriesBurned,
-            img = bitmap?.let { TrackingUtility.bitmapToBytes(it) }
+            img = TrackingUtility.bitmapToBytes(mapBitmap)
         )
         
         viewModelScope.launch {
@@ -111,5 +112,76 @@ class ResultViewModel @Inject constructor(
             _event.emit(ResultEvent.StopService(Constants.ACTION_STOP_SERVICE))
             _event.emit(ResultEvent.Navigate(Screen.HomeScreen.route))
         }
+    }
+
+    private fun generatePolylineBitmap(): android.graphics.Bitmap {
+        val pathPoints = _state.value.pathPoints
+        val width = 800
+        val height = 800
+        val bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(bitmap)
+        
+        // Background
+        canvas.drawColor(android.graphics.Color.BLACK) // Or RunningBlack if available, but pure black is fine for "dark mode" look
+        
+        if (pathPoints.isEmpty() || pathPoints.flatten().isEmpty()) return bitmap
+
+        val paint = android.graphics.Paint().apply {
+            color = android.graphics.Color.GREEN // RunningGreen equivalent
+            strokeWidth = 10f
+            style = android.graphics.Paint.Style.STROKE
+            isAntiAlias = true
+        }
+
+        val allPoints = pathPoints.flatten()
+        val minLat = allPoints.minOf { it.latitude }
+        val maxLat = allPoints.maxOf { it.latitude }
+        val minLng = allPoints.minOf { it.longitude }
+        val maxLng = allPoints.maxOf { it.longitude }
+
+        val latDiff = maxLat - minLat
+        val lngDiff = maxLng - minLng
+        val maxDiff = maxOf(latDiff, lngDiff)
+        
+        // Add some padding
+        val padding = 50f
+        val scaleX = (width - padding * 2) / lngDiff
+        val scaleY = (height - padding * 2) / latDiff
+        
+        // We want to maintain aspect ratio, so use the smaller scale, 
+        // OR just normalize to the box. 
+        // Using geographic coordinates directly on a flat canvas is a simple projection (Equirectangular).
+        // For small distances (running) it's acceptable.
+        
+        // To properly center and scale:
+        val scale = minOf(scaleX, scaleY)
+
+        pathPoints.forEach { polyline ->
+            val path = android.graphics.Path()
+            if (polyline.isNotEmpty()) {
+                val startPoint = polyline[0]
+                // Normalize and scale:
+                // x = (lng - minLng) * scale + padding
+                // y = height - ((lat - minLat) * scale + padding)   (because canvas Y is down, lat Y is up)
+                
+                // Centering adjustment if aspects differ
+                val offsetX = (width - (lngDiff * scale)) / 2
+                val offsetY = (height - (latDiff * scale)) / 2
+
+                var startX = ((startPoint.longitude - minLng) * scale + offsetX).toFloat()
+                var startY = (height - ((startPoint.latitude - minLat) * scale + offsetY)).toFloat()
+                
+                path.moveTo(startX, startY)
+                
+                for (i in 1 until polyline.size) {
+                    val p = polyline[i]
+                     val x = ((p.longitude - minLng) * scale + offsetX).toFloat()
+                     val y = (height - ((p.latitude - minLat) * scale + offsetY)).toFloat()
+                     path.lineTo(x, y)
+                }
+                canvas.drawPath(path, paint)
+            }
+        }
+        return bitmap
     }
 }

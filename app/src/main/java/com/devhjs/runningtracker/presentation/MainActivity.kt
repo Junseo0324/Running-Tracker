@@ -24,6 +24,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         gpsStatusMonitor.startMonitoring()
+        com.devhjs.runningtracker.presentation.util.AdHelper.loadInterstitial(this)
         
         enableEdgeToEdge()
         setContent {

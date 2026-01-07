@@ -64,6 +64,11 @@ fun RunHistoryScreen(
     runs: List<Run>,
     onNavigateUp: () -> Unit
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        com.devhjs.runningtracker.presentation.util.AdHelper.showInterstitial(context)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -90,6 +95,7 @@ fun RunHistoryScreen(
         }
 
         LazyColumn(
+            modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -97,6 +103,8 @@ fun RunHistoryScreen(
                 RunItemCard(run)
             }
         }
+        
+        com.devhjs.runningtracker.presentation.components.AdMobBanner()
     }
 }
 
