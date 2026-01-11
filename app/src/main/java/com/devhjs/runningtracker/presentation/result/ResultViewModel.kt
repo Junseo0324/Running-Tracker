@@ -3,7 +3,8 @@ package com.devhjs.runningtracker.presentation.result
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devhjs.runningtracker.core.Constants
-import com.devhjs.runningtracker.core.util.TrackingUtility
+import com.devhjs.runningtracker.core.util.ImageUtils
+import com.devhjs.runningtracker.core.util.MapUtils
 import com.devhjs.runningtracker.domain.model.Run
 import com.devhjs.runningtracker.domain.repository.MainRepository
 import com.devhjs.runningtracker.domain.repository.TrackingRepository
@@ -57,7 +58,7 @@ class ResultViewModel @Inject constructor(
         var distanceInMeters = 0f
         if (pathPoints.isNotEmpty()) {
             pathPoints.forEach { polyline ->
-                distanceInMeters += TrackingUtility.calculatePolylineLength(polyline)
+                distanceInMeters += MapUtils.calculatePolylineLength(polyline)
             }
         }
         
@@ -104,7 +105,7 @@ class ResultViewModel @Inject constructor(
             distanceInMeters = currentState.distanceInMeters.toInt(),
             timeInMillis = currentState.timeInMillis,
             caloriesBurned = currentState.caloriesBurned,
-            img = TrackingUtility.bitmapToBytes(mapBitmap)
+            img = ImageUtils.bitmapToBytes(mapBitmap)
         )
         
         viewModelScope.launch {

@@ -34,9 +34,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
 import com.devhjs.runningtracker.core.Constants.POLYLINE_COLOR
 import com.devhjs.runningtracker.core.Constants.POLYLINE_WIDTH
-import com.devhjs.runningtracker.core.util.TrackingUtility
+import com.devhjs.runningtracker.core.util.TimeUtils
 import com.devhjs.runningtracker.presentation.components.PrimaryButton
 import com.devhjs.runningtracker.presentation.components.StatsCardItem
 import com.devhjs.runningtracker.ui.theme.RunningBlack
@@ -173,7 +174,7 @@ fun ResultScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        StatsCardItem(label = "Time", value = TrackingUtility.getFormattedStopWatchTime(state.timeInMillis))
+                        StatsCardItem(label = "Time", value = TimeUtils.getFormattedStopWatchTime(state.timeInMillis))
                         StatsCardItem(label = "Avg Pace", value = "${String.format("%.2f", state.avgSpeed)}'")
                     }
                     Spacer(modifier = Modifier.height(16.dp))

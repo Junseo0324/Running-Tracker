@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.devhjs.runningtracker.core.Constants.POLYLINE_COLOR
 import com.devhjs.runningtracker.core.Constants.POLYLINE_WIDTH
-import com.devhjs.runningtracker.core.util.TrackingUtility
+import com.devhjs.runningtracker.core.util.TimeUtils
 import com.devhjs.runningtracker.presentation.components.StatsCardItem
 import com.devhjs.runningtracker.ui.theme.RunningBlack
 import com.devhjs.runningtracker.ui.theme.RunningGreen
@@ -124,7 +124,7 @@ fun RunScreen(
                         fontSize = 14.sp
                     )
                     Text(
-                        text = TrackingUtility.getFormattedStopWatchTime(state.curTimeInMillis),
+                        text = TimeUtils.getFormattedStopWatchTime(state.curTimeInMillis),
                         color = TextWhite,
                         fontSize = 56.sp,
                         fontWeight = FontWeight.Bold

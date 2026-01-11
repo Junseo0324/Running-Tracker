@@ -3,7 +3,7 @@ package com.devhjs.runningtracker.presentation.run
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devhjs.runningtracker.core.Constants
-import com.devhjs.runningtracker.core.util.TrackingUtility
+import com.devhjs.runningtracker.core.util.MapUtils
 import com.devhjs.runningtracker.domain.repository.TrackingRepository
 import com.devhjs.runningtracker.presentation.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -92,7 +92,7 @@ class RunViewModel @Inject constructor(
         
         val distanceInMeters = if (pathPoints.isNotEmpty()) {
             pathPoints.fold(0f) { acc, polyline ->
-                acc + TrackingUtility.calculatePolylineLength(polyline)
+                acc + MapUtils.calculatePolylineLength(polyline)
             }
         } else 0f
         

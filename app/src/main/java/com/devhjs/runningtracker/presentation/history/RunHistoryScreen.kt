@@ -38,7 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.devhjs.runningtracker.core.util.TrackingUtility
+import com.devhjs.runningtracker.core.util.ImageUtils
+import com.devhjs.runningtracker.core.util.TimeUtils
 import com.devhjs.runningtracker.domain.model.Run
 import com.devhjs.runningtracker.ui.theme.RunningBlack
 import com.devhjs.runningtracker.ui.theme.RunningGreen
@@ -154,7 +155,7 @@ fun RunItemCard(run: Run) {
                     Column {
                         Text(text = "시간", color = TextGrey, fontSize = 12.sp)
                         Text(
-                            text = TrackingUtility.getFormattedStopWatchTime(run.timeInMillis),
+                            text = TimeUtils.getFormattedStopWatchTime(run.timeInMillis),
                             color = TextWhite,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
@@ -181,7 +182,7 @@ fun RunItemCard(run: Run) {
             ) {
                 run.img?.let {
                     Image(
-                        bitmap = TrackingUtility.bytesToBitmap(it).asImageBitmap(),
+                        bitmap = ImageUtils.bytesToBitmap(it).asImageBitmap(),
                         contentDescription = "Run Path",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop

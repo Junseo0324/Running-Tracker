@@ -25,7 +25,8 @@ import com.devhjs.runningtracker.core.Constants.NOTIFICATION_CHANNEL_ID
 import com.devhjs.runningtracker.core.Constants.NOTIFICATION_CHANNEL_NAME
 import com.devhjs.runningtracker.core.Constants.NOTIFICATION_ID
 import com.devhjs.runningtracker.core.Constants.TIMER_UPDATE_INTERVAL
-import com.devhjs.runningtracker.core.util.TrackingUtility
+import com.devhjs.runningtracker.core.util.LocationUtils
+import com.devhjs.runningtracker.core.util.TimeUtils
 import com.devhjs.runningtracker.domain.repository.TrackingRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -195,7 +196,7 @@ class TrackingService : LifecycleService() {
         if (!serviceKilled) {
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val notification = curNotificationBuilder
-                .setContentText(TrackingUtility.getFormattedStopWatchTime(timeInMillis))
+                .setContentText(TimeUtils.getFormattedStopWatchTime(timeInMillis))
             notificationManager.notify(NOTIFICATION_ID, notification.build())
         }
     }
@@ -221,7 +222,7 @@ class TrackingService : LifecycleService() {
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun updateLocationTracking(isTracking: Boolean) {
         if (isTracking) {
-            if (TrackingUtility.hasLocationPermissions(this)) {
+            if (LocationUtils.hasLocationPermissions(this)) {
                 val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_UPDATE_INTERVAL)
                     .setMinUpdateIntervalMillis(FASTEST_LOCATION_INTERVAL)
                     .build()
@@ -287,7 +288,7 @@ class TrackingService : LifecycleService() {
 
         // Reflection removed. Recreating builder instead.
         val currentTimeInMillis = trackingRepository.timeRunInMillis.value
-        val formattedTime = TrackingUtility.getFormattedStopWatchTime(currentTimeInMillis)
+        val formattedTime = TimeUtils.getFormattedStopWatchTime(currentTimeInMillis)
 
         curNotificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setAutoCancel(false)
