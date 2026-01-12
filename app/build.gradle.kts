@@ -46,6 +46,18 @@ android {
         manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
         buildConfigField("String", "ADMOB_BANNER_ID", "\"$admobBannerId\"")
         buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$admobInterstitialId\"")
+        buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$admobInterstitialId\"")
+    }
+
+    flavorDimensions += "environment"
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            versionNameSuffix = "-dev"
+        }
+        create("prod") {
+            dimension = "environment"
+        }
     }
 
     buildTypes {

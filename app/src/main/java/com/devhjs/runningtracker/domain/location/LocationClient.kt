@@ -1,14 +1,13 @@
-package com.devhjs.runningtracker.domain.repository
+package com.devhjs.runningtracker.domain.location
 
 import android.location.Location
 import kotlinx.coroutines.flow.Flow
 
 /**
- * 위치 정보에 접근하기 위한 도메인 계층(Domain Layer)의 레포지토리 인터페이스입니다.
- *
- * Clean Architecture 원칙에 따라, 앱의 비즈니스 로직(UseCase 등)은 구체적인 위치 추적 구현
+ * 위치 정보에 접근하기 위한 인터페이스입니다.
+ * Android System Location 서비스에 대한 클라이언트 역할을 합니다.
  */
-interface LocationRepository {
+interface LocationClient {
 
     /**
      * 현재 위치 정보를 실시간 데이터 스트림(Flow) 형태로 제공합니다.

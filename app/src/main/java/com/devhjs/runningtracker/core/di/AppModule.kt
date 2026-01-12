@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import com.devhjs.runningtracker.core.Constants.RUNNING_DATABASE_NAME
 import com.devhjs.runningtracker.data.local.RunningDatabase
-import com.devhjs.runningtracker.data.repository.LocationRepositoryImpl
-import com.devhjs.runningtracker.domain.repository.LocationRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices.getFusedLocationProviderClient
 import dagger.Module
@@ -39,11 +37,5 @@ object AppModule {
         @ApplicationContext app: Context
     ) = getFusedLocationProviderClient(app)
 
-    @Singleton
-    @Provides
-    fun provideLocationRepository(
-        client: FusedLocationProviderClient
-    ): LocationRepository {
-        return LocationRepositoryImpl(client)
-    }
+
 }

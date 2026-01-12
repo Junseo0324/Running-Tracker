@@ -1,9 +1,9 @@
-package com.devhjs.runningtracker.data.repository
+package com.devhjs.runningtracker.data.location
 
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Looper
-import com.devhjs.runningtracker.domain.repository.LocationRepository
+import com.devhjs.runningtracker.domain.location.LocationClient
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -15,15 +15,12 @@ import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
 /**
- * [LocationRepository]의 구현체입니다.
- * Google Play Services의 [FusedLocationProviderClient]를 사용하여 위치 정보를 가져옵니다.
- *
- * 이 클래스는 안드로이드 시스템의 위치 서비스를 사용하여 실제 디바이스의 위치 데이터를
- * [Flow] 형태로 변환하여 도메인 계층에 제공하는 역할을 합니다.
+ * [LocationClient]의 기본 구현체입니다.
+ * Google Play Services의 [FusedLocationProviderClient]를 사용하여 실제 위치 정보를 가져옵니다.
  */
-class LocationRepositoryImpl @Inject constructor(
+class DefaultLocationClient @Inject constructor(
     private val client: FusedLocationProviderClient
-): LocationRepository {
+): LocationClient {
 
     /**
      * FusedLocationProviderClient를 사용하여 주기적으로 위치 업데이트를 받습니다.
