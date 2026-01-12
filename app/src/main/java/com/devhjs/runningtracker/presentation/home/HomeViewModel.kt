@@ -2,7 +2,7 @@ package com.devhjs.runningtracker.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.devhjs.runningtracker.domain.repository.LocationRepository
+import com.devhjs.runningtracker.domain.location.LocationClient
 import com.devhjs.runningtracker.presentation.navigation.Screen
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +18,7 @@ import com.devhjs.runningtracker.domain.manager.RunningManager
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val locationRepository: LocationRepository,
+    private val locationClient: LocationClient,
     private val runningManager: RunningManager
 ): ViewModel() {
 
@@ -63,7 +63,7 @@ class HomeViewModel @Inject constructor(
         _state.update { it.copy(isLocationLoading = true) }
         viewModelScope.launch {
             try {
-                locationRepository.getLocationFlow().collect { location ->
+                locationClient.getLocationFlow().collect { location ->
                     _state.update { state -> 
                         state.copy(
                             currentLocation = LatLng(location.latitude, location.longitude),

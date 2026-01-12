@@ -1,9 +1,8 @@
 package com.devhjs.runningtracker.core.di
 
-import com.devhjs.runningtracker.data.connectivity.GpsStatusDataSource
-import com.devhjs.runningtracker.data.connectivity.GpsStatusDataSourceImpl
-import com.devhjs.runningtracker.data.datasource.TempRunDataSource
+
 import com.devhjs.runningtracker.data.datasource.TempRunDataSourceImpl
+import com.devhjs.runningtracker.domain.datasource.TempRunDataSource
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,11 +13,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 abstract class DataSourceModule {
 
-    @Singleton
-    @Binds
-    abstract fun bindGpsStatusDataSource(
-        gpsStatusDataSourceImpl: GpsStatusDataSourceImpl
-    ): GpsStatusDataSource
+
 
     @Singleton
     @Binds

@@ -3,6 +3,7 @@ package com.devhjs.runningtracker.data.datasource
 import android.content.Context
 import com.devhjs.runningtracker.data.local.SerializableLatLng
 import com.devhjs.runningtracker.data.local.TempRunState
+import com.devhjs.runningtracker.domain.datasource.TempRunDataSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

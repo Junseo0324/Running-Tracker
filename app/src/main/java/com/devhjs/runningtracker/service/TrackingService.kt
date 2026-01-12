@@ -28,15 +28,12 @@ import com.devhjs.runningtracker.core.Constants.TIMER_UPDATE_INTERVAL
 import com.devhjs.runningtracker.core.util.LocationUtils
 import com.devhjs.runningtracker.core.util.TimeUtils
 import com.devhjs.runningtracker.domain.manager.RunningManager
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.Priority
+import com.devhjs.runningtracker.domain.location.LocationClient
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -52,7 +49,7 @@ class TrackingService : LifecycleService() {
     var serviceKilled = false
 
     @Inject
-    lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    lateinit var locationClient: LocationClient
 
     @Inject
     lateinit var baseNotificationBuilder: NotificationCompat.Builder
@@ -197,41 +194,27 @@ class TrackingService : LifecycleService() {
         stopSelf()
     }
 
+    private var locationJob: Job? = null
+
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun updateLocationTracking(isTracking: Boolean) {
         if (isTracking) {
             if (LocationUtils.hasLocationPermissions(this)) {
-                val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_UPDATE_INTERVAL)
-                    .setMinUpdateIntervalMillis(FASTEST_LOCATION_INTERVAL)
-                    .build()
-                fusedLocationProviderClient.requestLocationUpdates(
-                    request,
-                    locationCallback,
-                    Looper.getMainLooper()
-                )
-            }
-        } else {
-            fusedLocationProviderClient.removeLocationUpdates(locationCallback)
-        }
-    }
-
-    val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(result: LocationResult) {
-            super.onLocationResult(result)
-            // Need to check isTracking from repo? 
-            // We can check local var or repo. 
-            // Since updateLocationTracking is reactive to flow, we can assume if this callback fires, we are likely tracking.
-            // But good to double check.
-            if(isTimerEnabled) { // Use local flag for sync safety or repo.isTracking.value
-                 result.locations.let { locations ->
-                    for (location in locations) {
-                        lifecycleScope.launch {
-                            runningManager.addLocation(location)
+                // Cancel previous job if any
+                locationJob?.cancel()
+                locationJob = lifecycleScope.launch {
+                    locationClient.getLocationFlow()
+                        .collect { location ->
+                            if (isTimerEnabled) {
+                                runningManager.addLocation(location)
+                                Timber.d("NEW LOCATION: ${location.latitude}, ${location.longitude}")
+                            }
                         }
-                        Timber.d("NEW LOCATION: ${location.latitude}, ${location.longitude}")
-                    }
                 }
             }
+        } else {
+            locationJob?.cancel()
+            locationJob = null
         }
     }
 

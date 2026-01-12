@@ -1,9 +1,9 @@
 package com.devhjs.runningtracker.data.manager
 
 import android.location.Location
-import com.devhjs.runningtracker.data.connectivity.GpsStatusDataSource
-import com.devhjs.runningtracker.data.datasource.TempRunDataSource
 import com.devhjs.runningtracker.data.local.SerializableLatLng
+import com.devhjs.runningtracker.domain.datasource.TempRunDataSource
+import com.devhjs.runningtracker.domain.location.GpsStatusClient
 import com.devhjs.runningtracker.domain.manager.RunningManager
 import com.devhjs.runningtracker.service.Polylines
 import com.google.android.gms.maps.model.LatLng
@@ -21,7 +21,7 @@ import javax.inject.Singleton
 
 @Singleton
 class RunningManagerImpl @Inject constructor(
-    gpsStatusDataSource: GpsStatusDataSource,
+    gpsStatusClient: GpsStatusClient,
     private val tempRunDataSource: TempRunDataSource
 ) : RunningManager {
 
@@ -37,7 +37,7 @@ class RunningManagerImpl @Inject constructor(
     private val _durationInMillis = MutableStateFlow(0L)
     override val durationInMillis: StateFlow<Long> = _durationInMillis.asStateFlow()
 
-    override val isGpsEnabled: StateFlow<Boolean> = gpsStatusDataSource.getGpsStatusFlow()
+    override val isGpsEnabled: StateFlow<Boolean> = gpsStatusClient.getGpsStatusFlow()
         .stateIn(
             scope = scope,
             started = SharingStarted.Eagerly,

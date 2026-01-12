@@ -1,10 +1,11 @@
-package com.devhjs.runningtracker.data.connectivity
+package com.devhjs.runningtracker.data.location
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.location.LocationManager
+import com.devhjs.runningtracker.domain.location.GpsStatusClient
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -13,9 +14,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GpsStatusDataSourceImpl @Inject constructor(
+class DefaultGpsStatusClient @Inject constructor(
     @ApplicationContext private val context: Context
-) : GpsStatusDataSource {
+) : GpsStatusClient {
     /**
      * GPS 활성화 상태를 Flow로 방출합니다.
      * callbackFlow를 사용하여 BroadcastReceiver의 수명 주기를 수집(Collection) 수명 주기에 맞춥니다.

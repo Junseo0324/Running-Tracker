@@ -1,4 +1,4 @@
-package com.devhjs.runningtracker.data.datasource
+package com.devhjs.runningtracker.domain.datasource
 
 import com.devhjs.runningtracker.data.local.SerializableLatLng
 import com.devhjs.runningtracker.data.local.TempRunState
