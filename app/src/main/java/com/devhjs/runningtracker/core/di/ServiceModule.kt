@@ -23,27 +23,12 @@ object ServiceModule {
 
     @ServiceScoped
     @Provides
-    fun provideMainActivityPendingIntent(
-        @ApplicationContext app: Context
-    ): PendingIntent = PendingIntent.getActivity(
-        app,
-        0,
-        Intent(app, MainActivity::class.java).also {
-            it.action = ACTION_SHOW_TRACKING_FRAGMENT
-        },
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
-
-    @ServiceScoped
-    @Provides
     fun provideBaseNotificationBuilder(
-        @ApplicationContext app: Context,
-        pendingIntent: PendingIntent
+        @ApplicationContext app: Context
     ) = NotificationCompat.Builder(app, NOTIFICATION_CHANNEL_ID)
         .setAutoCancel(false)
         .setOngoing(true)
         .setSmallIcon(R.drawable.ic_launcher_foreground)
         .setContentTitle("Running Tracker")
         .setContentText("00:00:00")
-        .setContentIntent(pendingIntent)
 }

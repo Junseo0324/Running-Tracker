@@ -42,10 +42,16 @@ import javax.inject.Inject
 typealias Polyline = MutableList<LatLng>
 typealias Polylines = MutableList<Polyline>
 
+/**
+ * 러닝 기록을 백그라운드에서 추적하기 위한 포그라운드 서비스입니다.
+ * 앱이 화면에 보이지 않을 때도 위치를 수집하고, 타이머를 갱신하며, 알림창을 통해 상태를 표시합니다.
+ */
 @AndroidEntryPoint
 class TrackingService : LifecycleService() {
 
+    // 첫 실행 여부 확인 플래그
     var isFirstRun = true
+    // 서비스가 강제 종료(kill) 되었는지 확인하는 플래그
     var serviceKilled = false
 
     @Inject
@@ -56,10 +62,20 @@ class TrackingService : LifecycleService() {
 
     @Inject
     lateinit var runningManager: RunningManager
-    
-    @Inject
-    lateinit var mainActivityPendingIntent: PendingIntent
 
+    private val mainActivityPendingIntent: PendingIntent by lazy {
+        val intent = Intent(this, com.devhjs.runningtracker.presentation.MainActivity::class.java).apply {
+            action = com.devhjs.runningtracker.core.Constants.ACTION_SHOW_TRACKING_FRAGMENT
+        }
+        PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
+    // 현재 상태에 따라 업데이트될 알림 빌더
     lateinit var curNotificationBuilder: NotificationCompat.Builder
 
 
@@ -67,27 +83,25 @@ class TrackingService : LifecycleService() {
         super.onCreate()
         curNotificationBuilder = baseNotificationBuilder
         
-        
-        // Initialize Repository (postInitialValues logic moved to repo implicitly or explicitly here)
+        // 서비스 생성 시 초기화 로직
         lifecycleScope.launch {
-            // Try to restore state first
+            // 이전에 저장된 상태가 있다면 복원 시도
             runningManager.restoreState()
             
-            // If we restored data, sync local variables
+            // 복원된 데이터가 있다면 로컬 변수 동기화
             val restoredTime = runningManager.durationInMillis.value
             if (restoredTime > 0L) {
                 timeRun = restoredTime
                 isFirstRun = false
-                // Note: We don't automatically resume the timer here. User has to press start/resume.
-                // Or if we want START_STICKY to auto-resume, we'd need to know if we were running.
-                // For now, let's just restore data so it's not lost.
+                // 참고: 사용자가 직접 시작/재개를 누르지 않는 한 타이머를 자동으로 재개하지 않음.
+                // 데이터 유실 방지를 위해 복원만 수행.
             } else {
+                 // 복원할 데이터가 없으면 러닝 상태 초기화
                  runningManager.stopRun()
             }
         }
         
-        // Removed redundant fusedLocationProviderClient initialization (already injected)
-
+        // 러닝 상태(tracking 여부)를 관찰하여 위치 추적 및 알림 업데이트 관리
         lifecycleScope.launch {
             runningManager.isTracking.collect { isTracking ->
                 updateLocationTracking(isTracking)
@@ -98,9 +112,9 @@ class TrackingService : LifecycleService() {
     
     override fun onDestroy() {
         super.onDestroy()
-
     }
 
+    // 서비스 시작 명령(Intent Action) 처리
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.let {
             when (it.action) {
@@ -124,7 +138,7 @@ class TrackingService : LifecycleService() {
             }
         }
         super.onStartCommand(intent, flags, startId)
-        return START_STICKY
+        return START_STICKY // 시스템에 의해 강제 종료 시 서비스 재생성 시도
     }
 
     private var isTimerEnabled = false
@@ -133,8 +147,10 @@ class TrackingService : LifecycleService() {
     private var timeStarted = 0L
     private var lastSecondTimestamp = 0L
 
+    // 타이머 시작 및 러닝 시작 로직
     private fun startTimer() {
         lifecycleScope.launch {
+            // 새로운 경로(Polyline) 리스트 추가 및 러닝 상태 시작
             runningManager.addEmptyPolyline()
             runningManager.startResumeRun()
         }
@@ -142,19 +158,21 @@ class TrackingService : LifecycleService() {
         timeStarted = System.currentTimeMillis()
         isTimerEnabled = true
         
+        // 메인 스레드에서 타이머 코루틴 실행
         CoroutineScope(Dispatchers.Main).launch {
-            while (isTimerEnabled) { // Check local flag to stop coroutine loop
-                // time difference between now and timeStarted
+            while (isTimerEnabled) {
+                // 현재 시간과 시작 시간의 차이 계산 (랩 타임)
                 lapTime = System.currentTimeMillis() - timeStarted
-                // update the new lapTime
+                // 전체 러닝 시간 갱신
                 val timeRunInMillis = timeRun + lapTime
                 runningManager.updateDuration(timeRunInMillis)
                 
+                // 1초마다 알림창 시간 업데이트 및 상태 저장
                 if (timeRunInMillis >= lastSecondTimestamp + 1000L) {
                     lastSecondTimestamp += 1000L
                     updateNotificationTime(timeRunInMillis)
                     
-                    // Persist state every 5 seconds (approx) for crash recovery
+                    // 약 5초마다 데이터 영구 저장 (앱 충돌 대비)
                     if (lastSecondTimestamp % 5000L == 0L) {
                         lifecycleScope.launch {
                             runningManager.persistState()
@@ -163,10 +181,12 @@ class TrackingService : LifecycleService() {
                 }
                 delay(TIMER_UPDATE_INTERVAL)
             }
+            // 타이머 루프 종료 시 누적 시간 저장
             timeRun += lapTime
         }
     }
 
+    // 알림창에 표시되는 러닝 시간 업데이트
     private fun updateNotificationTime(timeInMillis: Long) {
         if (!serviceKilled) {
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -176,6 +196,7 @@ class TrackingService : LifecycleService() {
         }
     }
 
+    // 서비스 일시 정지 (타이머 중지)
     private fun pauseService() {
         lifecycleScope.launch {
             runningManager.pauseRun()
@@ -183,6 +204,7 @@ class TrackingService : LifecycleService() {
         isTimerEnabled = false
     }
 
+    // 서비스 완전 종료
     private fun killService() {
         serviceKilled = true
         isFirstRun = true
@@ -196,15 +218,17 @@ class TrackingService : LifecycleService() {
 
     private var locationJob: Job? = null
 
+    // 위치 추적 업데이트 로직 (권한 필요)
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun updateLocationTracking(isTracking: Boolean) {
         if (isTracking) {
             if (LocationUtils.hasLocationPermissions(this)) {
-                // Cancel previous job if any
+                // 기존 작업 취소 후 새로운 위치 수집 시작
                 locationJob?.cancel()
                 locationJob = lifecycleScope.launch {
                     locationClient.getLocationFlow()
                         .collect { location ->
+                            // 타이머가 작동 중일 때만 위치 데이터 저장
                             if (isTimerEnabled) {
                                 runningManager.addLocation(location)
                                 Timber.d("NEW LOCATION: ${location.latitude}, ${location.longitude}")
@@ -213,14 +237,16 @@ class TrackingService : LifecycleService() {
                 }
             }
         } else {
+            // 추적 중지 시 위치 수집 작업 취소
             locationJob?.cancel()
             locationJob = null
         }
     }
 
+    // 포그라운드 서비스 시작 및 알림 채널 생성
     private fun startForegroundService() {
         startTimer()
-        // isTracking set in startTimer
+        // startTimer 내부에서 isTracking 상태가 변경됨
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -231,6 +257,7 @@ class TrackingService : LifecycleService() {
         startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
     }
 
+    // 러닝 상태(재개/일시정지)에 따라 알림창 버튼 및 텍스트 업데이트
     private fun updateNotificationTrackingState(isTracking: Boolean) {
         val notificationActionText = if (isTracking) "Pause" else "Resume"
         val pendingIntent = if (isTracking) {
@@ -247,7 +274,6 @@ class TrackingService : LifecycleService() {
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // Reflection removed. Recreating builder instead.
         val currentTimeInMillis = runningManager.durationInMillis.value
         val formattedTime = TimeUtils.getFormattedStopWatchTime(currentTimeInMillis)
 
