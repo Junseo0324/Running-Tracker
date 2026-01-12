@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devhjs.runningtracker.core.Constants
 import com.devhjs.runningtracker.core.util.MapUtils
-import com.devhjs.runningtracker.domain.repository.TrackingRepository
+import com.devhjs.runningtracker.domain.manager.RunningManager
 import com.devhjs.runningtracker.presentation.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,7 +18,7 @@ import kotlin.math.roundToInt
 
 @HiltViewModel
 class RunViewModel @Inject constructor(
-    private val trackingRepository: TrackingRepository
+    private val runningManager: RunningManager
 ): ViewModel() {
 
     private val _state = MutableStateFlow(RunState())
@@ -29,13 +29,13 @@ class RunViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            trackingRepository.isTracking.collect { isTracking ->
+            runningManager.isTracking.collect { isTracking ->
                  _state.update { it.copy(isTracking = isTracking) }
             }
         }
         
         viewModelScope.launch {
-            trackingRepository.pathPoints.collect { pathPoints ->
+            runningManager.pathPoints.collect { pathPoints ->
                  // Create a new list structure to ensure Compose detects changes
                 val newPathPoints = pathPoints.map { it.toList() }
                 _state.update { 
@@ -49,14 +49,14 @@ class RunViewModel @Inject constructor(
         }
         
         viewModelScope.launch {
-            trackingRepository.timeRunInMillis.collect { time ->
+            runningManager.durationInMillis.collect { time ->
                  _state.update { it.copy(curTimeInMillis = time) }
                 updateStats()               
             }
         }
         
         viewModelScope.launch {
-            trackingRepository.isGpsEnabled.collect { isGpsEnabled ->
+            runningManager.isGpsEnabled.collect { isGpsEnabled ->
                 _state.update { it.copy(isGpsEnabled = isGpsEnabled) }
             }
         }

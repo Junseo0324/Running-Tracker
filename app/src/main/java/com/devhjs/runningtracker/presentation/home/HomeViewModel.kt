@@ -14,12 +14,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-import com.devhjs.runningtracker.domain.repository.TrackingRepository
+import com.devhjs.runningtracker.domain.manager.RunningManager
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
-    private val trackingRepository: TrackingRepository
+    private val runningManager: RunningManager
 ): ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -30,7 +30,7 @@ class HomeViewModel @Inject constructor(
     
     init {
         viewModelScope.launch {
-            trackingRepository.isGpsEnabled.collect { isGpsEnabled ->
+            runningManager.isGpsEnabled.collect { isGpsEnabled ->
                 _state.update { it.copy(isGpsEnabled = isGpsEnabled) }
             }
         }

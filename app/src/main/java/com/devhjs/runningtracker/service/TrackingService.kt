@@ -27,7 +27,7 @@ import com.devhjs.runningtracker.core.Constants.NOTIFICATION_ID
 import com.devhjs.runningtracker.core.Constants.TIMER_UPDATE_INTERVAL
 import com.devhjs.runningtracker.core.util.LocationUtils
 import com.devhjs.runningtracker.core.util.TimeUtils
-import com.devhjs.runningtracker.domain.repository.TrackingRepository
+import com.devhjs.runningtracker.domain.manager.RunningManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -58,7 +58,7 @@ class TrackingService : LifecycleService() {
     lateinit var baseNotificationBuilder: NotificationCompat.Builder
 
     @Inject
-    lateinit var trackingRepository: TrackingRepository
+    lateinit var runningManager: RunningManager
     
     @Inject
     lateinit var mainActivityPendingIntent: PendingIntent
@@ -74,10 +74,10 @@ class TrackingService : LifecycleService() {
         // Initialize Repository (postInitialValues logic moved to repo implicitly or explicitly here)
         lifecycleScope.launch {
             // Try to restore state first
-            trackingRepository.restoreState()
+            runningManager.restoreState()
             
             // If we restored data, sync local variables
-            val restoredTime = trackingRepository.timeRunInMillis.value
+            val restoredTime = runningManager.durationInMillis.value
             if (restoredTime > 0L) {
                 timeRun = restoredTime
                 isFirstRun = false
@@ -85,14 +85,14 @@ class TrackingService : LifecycleService() {
                 // Or if we want START_STICKY to auto-resume, we'd need to know if we were running.
                 // For now, let's just restore data so it's not lost.
             } else {
-                 trackingRepository.clearData()
+                 runningManager.stopRun()
             }
         }
         
         // Removed redundant fusedLocationProviderClient initialization (already injected)
 
         lifecycleScope.launch {
-            trackingRepository.isTracking.collect { isTracking ->
+            runningManager.isTracking.collect { isTracking ->
                 updateLocationTracking(isTracking)
                 updateNotificationTrackingState(isTracking)
             }
@@ -138,8 +138,8 @@ class TrackingService : LifecycleService() {
 
     private fun startTimer() {
         lifecycleScope.launch {
-            trackingRepository.addEmptyPolyline()
-            trackingRepository.setIsTracking(true)
+            runningManager.addEmptyPolyline()
+            runningManager.startResumeRun()
         }
         
         timeStarted = System.currentTimeMillis()
@@ -151,7 +151,7 @@ class TrackingService : LifecycleService() {
                 lapTime = System.currentTimeMillis() - timeStarted
                 // update the new lapTime
                 val timeRunInMillis = timeRun + lapTime
-                trackingRepository.updateTimeRunInMillis(timeRunInMillis)
+                runningManager.updateDuration(timeRunInMillis)
                 
                 if (timeRunInMillis >= lastSecondTimestamp + 1000L) {
                     lastSecondTimestamp += 1000L
@@ -160,7 +160,7 @@ class TrackingService : LifecycleService() {
                     // Persist state every 5 seconds (approx) for crash recovery
                     if (lastSecondTimestamp % 5000L == 0L) {
                         lifecycleScope.launch {
-                            trackingRepository.persistState()
+                            runningManager.persistState()
                         }
                     }
                 }
@@ -181,7 +181,7 @@ class TrackingService : LifecycleService() {
 
     private fun pauseService() {
         lifecycleScope.launch {
-            trackingRepository.setIsTracking(false)
+            runningManager.pauseRun()
         }
         isTimerEnabled = false
     }
@@ -191,7 +191,7 @@ class TrackingService : LifecycleService() {
         isFirstRun = true
         pauseService()
         lifecycleScope.launch {
-            trackingRepository.clearData()
+            runningManager.stopRun()
         }
         stopForeground(true)
         stopSelf()
@@ -226,7 +226,7 @@ class TrackingService : LifecycleService() {
                  result.locations.let { locations ->
                     for (location in locations) {
                         lifecycleScope.launch {
-                            trackingRepository.addPathPoint(location)
+                            runningManager.addLocation(location)
                         }
                         Timber.d("NEW LOCATION: ${location.latitude}, ${location.longitude}")
                     }
@@ -265,7 +265,7 @@ class TrackingService : LifecycleService() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // Reflection removed. Recreating builder instead.
-        val currentTimeInMillis = trackingRepository.timeRunInMillis.value
+        val currentTimeInMillis = runningManager.durationInMillis.value
         val formattedTime = TimeUtils.getFormattedStopWatchTime(currentTimeInMillis)
 
         curNotificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
