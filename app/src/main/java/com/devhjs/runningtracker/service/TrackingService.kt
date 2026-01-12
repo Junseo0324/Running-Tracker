@@ -65,33 +65,11 @@ class TrackingService : LifecycleService() {
 
     lateinit var curNotificationBuilder: NotificationCompat.Builder
 
-    private val gpsBroadcastReceiver = object : android.content.BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == LocationManager.PROVIDERS_CHANGED_ACTION) {
-                val locationManager = context.getSystemService(LOCATION_SERVICE) as LocationManager
-                val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                lifecycleScope.launch {
-                    trackingRepository.setGpsEnabled(isGpsEnabled)
-                }
-            }
-        }
-    }
 
     override fun onCreate() {
         super.onCreate()
         curNotificationBuilder = baseNotificationBuilder
         
-        // Register GPS Status Receiver
-        registerReceiver(gpsBroadcastReceiver,
-            IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
-        )
-        
-        // Initial GPS Check
-        val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        lifecycleScope.launch {
-            trackingRepository.setGpsEnabled(isGpsEnabled)
-        }
         
         // Initialize Repository (postInitialValues logic moved to repo implicitly or explicitly here)
         lifecycleScope.launch {
@@ -123,7 +101,7 @@ class TrackingService : LifecycleService() {
     
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(gpsBroadcastReceiver)
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
