@@ -7,7 +7,7 @@ import com.devhjs.runningtracker.core.util.ImageUtils
 import com.devhjs.runningtracker.core.util.MapUtils
 import com.devhjs.runningtracker.domain.model.Run
 import com.devhjs.runningtracker.domain.repository.MainRepository
-import com.devhjs.runningtracker.domain.repository.TrackingRepository
+import com.devhjs.runningtracker.domain.manager.RunningManager
 import com.devhjs.runningtracker.presentation.navigation.Screen
 
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ResultViewModel @Inject constructor(
     val mainRepository: MainRepository,
-    private val trackingRepository: TrackingRepository
+    private val runningManager: RunningManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ResultState())
@@ -39,14 +39,14 @@ class ResultViewModel @Inject constructor(
     init {
         // Observe Repository Data to populate ResultState
         viewModelScope.launch {
-            trackingRepository.pathPoints.collect { pathPoints ->
+            runningManager.pathPoints.collect { pathPoints ->
                 _state.update { it.copy(pathPoints = pathPoints) }
                 calculateStats()
             }
         }
         
         viewModelScope.launch {
-            trackingRepository.timeRunInMillis.collect { timeInMillis ->
+            runningManager.durationInMillis.collect { timeInMillis ->
                 _state.update { it.copy(timeInMillis = timeInMillis) }
                 calculateStats()
             }
