@@ -6,10 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface MainRepository {
     suspend fun insertRun(run: Run)
     suspend fun deleteRun(run: Run)
-    
-    // Changing return types to Flow<List<Run>> is typical for Room but DAO returns Flow<List<RunEntity>>
-    // Repository must map Flow<List<RunEntity>> -> Flow<List<Run>>
-    
+
     fun getAllRunsSortedByDate(): Flow<List<Run>>
     fun getAllRunsSortedByDistance(): Flow<List<Run>>
     fun getAllRunsSortedByTimeInMillis(): Flow<List<Run>>

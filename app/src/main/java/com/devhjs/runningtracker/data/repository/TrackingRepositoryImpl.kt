@@ -2,6 +2,7 @@ package com.devhjs.runningtracker.data.repository
 
 import android.content.Context
 import android.location.Location
+import com.devhjs.runningtracker.data.connectivity.GpsStatusDataSource
 import com.devhjs.runningtracker.domain.repository.TrackingRepository
 import com.devhjs.runningtracker.service.Polylines
 import com.google.android.gms.maps.model.LatLng
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -18,7 +20,8 @@ import javax.inject.Singleton
 
 @Singleton
 class TrackingRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val gpsStatusDataSource: GpsStatusDataSource
 ) : TrackingRepository {
 
     private val _isTracking = MutableStateFlow(false)
@@ -33,7 +36,24 @@ class TrackingRepositoryImpl @Inject constructor(
     private val _isGpsEnabled = MutableStateFlow(true)
     override val isGpsEnabled: StateFlow<Boolean> = _isGpsEnabled.asStateFlow()
 
+    init {
+        // GPS 상태 모니터링 시작
+        // Repository는 싱글톤이므로 Application Scope에서 동작합니다.
+        // GlobalScope보다는 독자적인 CoroutineScope를 주입받는 것이 좋지만,
+        // 여기서는 간단히 Main Dispatcher를 가진 Scope를 생성하여 처리하거나
+        // hilt로 주입된 scope가 없다면 flow.stateIn() 패턴을 사용할 수도 있습니다.
+        // 하지만 기존 구조를 유지하며 init에서 job을 실행합니다.
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main).launch {
+            gpsStatusDataSource.getGpsStatusFlow().collect { isEnabled ->
+                _isGpsEnabled.value = isEnabled
+            }
+        }
+    }
+
     override suspend fun setGpsEnabled(isEnabled: Boolean) {
+        // DataSource로부터 업데이트되므로 외부에서 수동 설정은 필요 없을 수 있으나,
+        // 인터페이스 호환성을 위해 남겨두거나 빈 구현으로 둡니다.
+        // 혹은 테스트 등을 위해 남겨둘 수 있습니다.
         _isGpsEnabled.value = isEnabled
     }
 

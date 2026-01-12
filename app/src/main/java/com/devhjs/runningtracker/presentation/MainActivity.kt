@@ -17,13 +17,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var gpsStatusMonitor: com.devhjs.runningtracker.data.connectivity.GpsStatusMonitor
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        gpsStatusMonitor.startMonitoring()
         com.devhjs.runningtracker.presentation.util.AdHelper.loadInterstitial(this)
         
         enableEdgeToEdge()
@@ -40,7 +36,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        gpsStatusMonitor.stopMonitoring()
     }
 }
 
