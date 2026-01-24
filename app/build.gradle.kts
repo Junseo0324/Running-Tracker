@@ -27,12 +27,10 @@ android {
     val admobBannerIdReal = localProperties.getProperty("ADMOB_BANNER_ID") ?: ""
     val admobInterstitialIdReal = localProperties.getProperty("ADMOB_INTERSTITIAL_ID") ?: ""
     
-    // For now, use Test IDs. Change this to false to use Real IDs.
-    val useTestAds = true
-    
-    val admobAppId = if (useTestAds) "ca-app-pub-3940256099942544~3347511713" else admobAppIdReal
-    val admobBannerId = if (useTestAds) "ca-app-pub-3940256099942544/6300978111" else admobBannerIdReal
-    val admobInterstitialId = if (useTestAds) "ca-app-pub-3940256099942544/1033173712" else admobInterstitialIdReal
+    // Test IDs
+    val admobAppIdTest = "ca-app-pub-3940256099942544~3347511713"
+    val admobBannerIdTest = "ca-app-pub-3940256099942544/6300978111"
+    val admobInterstitialIdTest = "ca-app-pub-3940256099942544/1033173712"
 
     defaultConfig {
         applicationId = "com.devhjs.runningtracker"
@@ -43,10 +41,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
-        manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
-        buildConfigField("String", "ADMOB_BANNER_ID", "\"$admobBannerId\"")
-        buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$admobInterstitialId\"")
-        buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$admobInterstitialId\"")
     }
 
     flavorDimensions += "environment"
@@ -62,11 +56,22 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            
+            // Release Configuration: Use Real IDs
+            manifestPlaceholders["ADMOB_APP_ID"] = admobAppIdReal
+            buildConfigField("String", "ADMOB_BANNER_ID", "\"$admobBannerIdReal\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$admobInterstitialIdReal\"")
+        }
+        debug {
+            // Debug Configuration: Use Test IDs
+            manifestPlaceholders["ADMOB_APP_ID"] = admobAppIdTest
+            buildConfigField("String", "ADMOB_BANNER_ID", "\"$admobBannerIdTest\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$admobInterstitialIdTest\"")
         }
     }
     compileOptions {
