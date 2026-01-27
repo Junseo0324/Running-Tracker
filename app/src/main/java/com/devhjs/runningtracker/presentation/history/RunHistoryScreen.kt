@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.devhjs.runningtracker.domain.model.Run
+import com.devhjs.runningtracker.presentation.components.AdMobBanner
 import com.devhjs.runningtracker.presentation.components.RunItemCard
 import com.devhjs.runningtracker.presentation.util.AdHelper
 import com.devhjs.runningtracker.ui.theme.RunningBlack
@@ -77,6 +78,6 @@ fun RunHistoryScreen(
             }
         }
         
-        com.devhjs.runningtracker.presentation.components.AdMobBanner()
+        AdMobBanner()
     }
 }
