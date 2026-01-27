@@ -280,7 +280,7 @@ class TrackingService : LifecycleService() {
         curNotificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setAutoCancel(false)
             .setOngoing(true)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.workout_run)
             .setContentTitle("Running Tracker")
             .setContentText(formattedTime)
             .setContentIntent(mainActivityPendingIntent)
