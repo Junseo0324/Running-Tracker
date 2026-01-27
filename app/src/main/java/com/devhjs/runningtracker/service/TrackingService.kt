@@ -1,34 +1,29 @@
 package com.devhjs.runningtracker.service
 
-import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.location.LocationManager
 import android.os.Build
-import android.os.Looper
 import androidx.annotation.RequiresApi
-import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.devhjs.runningtracker.R
+import com.devhjs.runningtracker.core.Constants
 import com.devhjs.runningtracker.core.Constants.ACTION_PAUSE_SERVICE
 import com.devhjs.runningtracker.core.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.devhjs.runningtracker.core.Constants.ACTION_STOP_SERVICE
-import com.devhjs.runningtracker.core.Constants.FASTEST_LOCATION_INTERVAL
-import com.devhjs.runningtracker.core.Constants.LOCATION_UPDATE_INTERVAL
 import com.devhjs.runningtracker.core.Constants.NOTIFICATION_CHANNEL_ID
 import com.devhjs.runningtracker.core.Constants.NOTIFICATION_CHANNEL_NAME
 import com.devhjs.runningtracker.core.Constants.NOTIFICATION_ID
 import com.devhjs.runningtracker.core.Constants.TIMER_UPDATE_INTERVAL
 import com.devhjs.runningtracker.core.util.LocationUtils
 import com.devhjs.runningtracker.core.util.TimeUtils
-import com.devhjs.runningtracker.domain.manager.RunningManager
 import com.devhjs.runningtracker.domain.location.LocationClient
+import com.devhjs.runningtracker.domain.manager.RunningManager
+import com.devhjs.runningtracker.presentation.MainActivity
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -64,8 +59,8 @@ class TrackingService : LifecycleService() {
     lateinit var runningManager: RunningManager
 
     private val mainActivityPendingIntent: PendingIntent by lazy {
-        val intent = Intent(this, com.devhjs.runningtracker.presentation.MainActivity::class.java).apply {
-            action = com.devhjs.runningtracker.core.Constants.ACTION_SHOW_TRACKING_FRAGMENT
+        val intent = Intent(this, MainActivity::class.java).apply {
+            action = Constants.ACTION_SHOW_TRACKING_FRAGMENT
         }
         PendingIntent.getActivity(
             this,
@@ -105,7 +100,7 @@ class TrackingService : LifecycleService() {
         lifecycleScope.launch {
             runningManager.isTracking.collect { isTracking ->
                 updateLocationTracking(isTracking)
-                updateNotificationTrackingState(isTracking)
+                updateNotificationTrackingState()
             }
         }
     }
@@ -219,7 +214,6 @@ class TrackingService : LifecycleService() {
     private var locationJob: Job? = null
 
     // 위치 추적 업데이트 로직 (권한 필요)
-    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun updateLocationTracking(isTracking: Boolean) {
         if (isTracking) {
             if (LocationUtils.hasLocationPermissions(this)) {
@@ -257,21 +251,8 @@ class TrackingService : LifecycleService() {
         startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
     }
 
-    // 러닝 상태(재개/일시정지)에 따라 알림창 버튼 및 텍스트 업데이트
-    private fun updateNotificationTrackingState(isTracking: Boolean) {
-        val notificationActionText = if (isTracking) "Pause" else "Resume"
-        val pendingIntent = if (isTracking) {
-            val pauseIntent = Intent(this, TrackingService::class.java).apply {
-                action = ACTION_PAUSE_SERVICE
-            }
-            PendingIntent.getService(this, 1, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        } else {
-            val resumeIntent = Intent(this, TrackingService::class.java).apply {
-                action = ACTION_START_OR_RESUME_SERVICE
-            }
-            PendingIntent.getService(this, 2, resumeIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        }
-
+    // 러닝 상태에 따라 알림창 업데이트 (시간만 표시)
+    private fun updateNotificationTrackingState() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val currentTimeInMillis = runningManager.durationInMillis.value
@@ -284,7 +265,6 @@ class TrackingService : LifecycleService() {
             .setContentTitle("Running Tracker")
             .setContentText(formattedTime)
             .setContentIntent(mainActivityPendingIntent)
-            .addAction(R.drawable.ic_launcher_foreground, notificationActionText, pendingIntent)
         
         if (!serviceKilled) {
             notificationManager.notify(NOTIFICATION_ID, curNotificationBuilder.build())
