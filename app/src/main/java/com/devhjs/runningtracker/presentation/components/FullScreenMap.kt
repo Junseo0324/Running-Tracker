@@ -27,7 +27,7 @@ fun FullScreenMap(
     LaunchedEffect(currentLocation) {
         currentLocation?.let {
             cameraPositionState.animate(
-                CameraUpdateFactory.newLatLngZoom(it, 15f)
+                CameraUpdateFactory.newLatLng(it)
             )
         }
     }
