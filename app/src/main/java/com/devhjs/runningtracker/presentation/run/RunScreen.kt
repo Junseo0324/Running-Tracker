@@ -18,10 +18,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -137,9 +139,9 @@ fun RunScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        StatsCardItem(label = "km", value = String.format("%.2f", state.distanceInMeters / 1000f))
-                        StatsCardItem(label = "평균 페이스", value = if (state.avgSpeed > 0) String.format("%.1f", state.avgSpeed) else "0.0") 
-                        StatsCardItem(label = "kcal", value = "${state.caloriesBurned}")
+                        StatsCardItem(label = "km", value = String.format("%.2f", state.distanceInMeters / 1000f), icon= Icons.Default.Speed)
+                        StatsCardItem(label = "평균 페이스", value = if (state.avgSpeed > 0) String.format("%.1f", state.avgSpeed) else "0.0", icon= Icons.Default.Speed)
+                        StatsCardItem(label = "kcal", value = "${state.caloriesBurned}", icon =Icons.Default.LocalFireDepartment)
                     }
                 }
             }

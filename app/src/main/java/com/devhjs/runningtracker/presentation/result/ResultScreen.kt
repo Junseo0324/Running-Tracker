@@ -14,7 +14,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Cable
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -75,9 +79,9 @@ fun ResultScreen(
             val boundsBuilder = LatLngBounds.Builder()
             state.pathPoints.flatten().forEach { boundsBuilder.include(it) }
             val bounds = boundsBuilder.build()
-            
+
             val paddingPx = with(localDensity) { 64.dp.toPx() }.toInt()
-            
+
             cameraPositionState.animate(
                  CameraUpdateFactory.newLatLngBounds(bounds, paddingPx)
             )
@@ -117,7 +121,7 @@ fun ResultScreen(
                 .padding(top = 48.dp, start = 16.dp, end = 16.dp)
         ) {
             IconButton(
-                onClick = { 
+                onClick = {
                      onAction(ResultAction.OnDiscardClick)
                 },
                 modifier = Modifier
@@ -126,11 +130,11 @@ fun ResultScreen(
             ) {
                 Icon(Icons.Default.Close, contentDescription = "Close", tint = TextWhite)
             }
-            
+
             Text(
-                text = "운동 결과", 
-                color = TextWhite, 
-                fontWeight = FontWeight.Bold, 
+                text = "운동 결과",
+                color = TextWhite,
+                fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
                 modifier = Modifier
                     .align(Alignment.Center)
@@ -161,29 +165,29 @@ fun ResultScreen(
                 ) {
                     Text(text = "TOTAL DISTANCE", color = TextGrey, fontSize = 14.sp)
                     Text(
-                        text = "${String.format("%.2f", state.distanceInMeters / 1000f)} km", 
-                        color = RunningGreen, 
-                        fontSize = 48.sp, 
+                        text = "${String.format("%.2f", state.distanceInMeters / 1000f)} km",
+                        color = RunningGreen,
+                        fontSize = 48.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    
+
                     Spacer(modifier = Modifier.height(24.dp))
-                    
+
                     // Stats Grid
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        StatsCardItem(label = "Time", value = TimeUtils.getFormattedStopWatchTime(state.timeInMillis))
-                        StatsCardItem(label = "Avg Pace", value = "${String.format("%.2f", state.avgSpeed)}'")
+                        StatsCardItem(label = "Time", value = TimeUtils.getFormattedStopWatchTime(state.timeInMillis), icon = Icons.Default.AccessTime)
+                        StatsCardItem(label = "Avg Pace", value = "${String.format("%.2f", state.avgSpeed)}'", icon= Icons.Default.Speed)
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        StatsCardItem(label = "Calories", value = "${state.caloriesBurned}")
-                        StatsCardItem(label = "Elevation", value = "0 m") // Dummy
+                        StatsCardItem(label = "Calories", value = "${state.caloriesBurned}", icon =Icons.Default.LocalFireDepartment)
+                        StatsCardItem(label = "Elevation", value = "0 m", icon = Icons.Default.Cable) // Dummy
                     }
 
                     Spacer(modifier = Modifier.height(32.dp))
@@ -196,7 +200,7 @@ fun ResultScreen(
                     )
                 }
             }
-            
+
             com.devhjs.runningtracker.presentation.components.AdMobBanner(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
