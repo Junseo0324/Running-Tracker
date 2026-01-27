@@ -1,6 +1,7 @@
 package com.devhjs.runningtracker.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,8 +12,16 @@ import com.devhjs.runningtracker.presentation.run.RunScreenRoot
 
 @Composable
 fun Navigation(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    shouldNavigateToRun: Boolean = false
 ) {
+    // 알림에서 앱을 열었으면 HomeScreen을 백스택에 유지하면서 RunScreen으로 이동
+    LaunchedEffect(shouldNavigateToRun) {
+        if (shouldNavigateToRun) {
+            navController.navigate(Screen.RunScreen.route)
+        }
+    }
+    
     NavHost(
         navController = navController,
         startDestination = Screen.HomeScreen.route

@@ -9,11 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import com.devhjs.runningtracker.core.Constants.ACTION_SHOW_TRACKING_FRAGMENT
 import com.devhjs.runningtracker.presentation.navigation.Navigation
+import com.devhjs.runningtracker.presentation.util.AdHelper
 import com.devhjs.runningtracker.ui.theme.RunningTrackerTheme
 import com.google.android.gms.ads.MobileAds
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -22,14 +23,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         MobileAds.initialize(this)
-        com.devhjs.runningtracker.presentation.util.AdHelper.loadInterstitial(this)
+        AdHelper.loadInterstitial(this)
+        
+        // 알림에서 앱을 열었는지 확인
+        val shouldNavigateToRun = intent?.action == ACTION_SHOW_TRACKING_FRAGMENT
         
         enableEdgeToEdge()
         setContent {
             RunningTrackerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
-                        Navigation()
+                        Navigation(shouldNavigateToRun = shouldNavigateToRun)
                     }
                 }
             }
@@ -40,6 +44,3 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
     }
 }
-
-
-
