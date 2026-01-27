@@ -71,12 +71,12 @@ class TrackingService : LifecycleService() {
     }
 
     // 현재 상태에 따라 업데이트될 알림 빌더
-    lateinit var curNotificationBuilder: NotificationCompat.Builder
+    lateinit var trackingNotificationBuilder: NotificationCompat.Builder
 
 
     override fun onCreate() {
         super.onCreate()
-        curNotificationBuilder = baseNotificationBuilder
+        trackingNotificationBuilder = baseNotificationBuilder
         
         // 서비스 생성 시 초기화 로직
         lifecycleScope.launch {
@@ -185,7 +185,7 @@ class TrackingService : LifecycleService() {
     private fun updateNotificationTime(timeInMillis: Long) {
         if (!serviceKilled) {
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            val notification = curNotificationBuilder
+            val notification = trackingNotificationBuilder
                 .setContentText(TimeUtils.getFormattedStopWatchTime(timeInMillis))
             notificationManager.notify(NOTIFICATION_ID, notification.build())
         }
@@ -258,16 +258,16 @@ class TrackingService : LifecycleService() {
         val currentTimeInMillis = runningManager.durationInMillis.value
         val formattedTime = TimeUtils.getFormattedStopWatchTime(currentTimeInMillis)
 
-        curNotificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+        trackingNotificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setAutoCancel(false)
             .setOngoing(true)
             .setSmallIcon(R.drawable.workout_run)
             .setContentTitle("Running Tracker")
             .setContentText(formattedTime)
             .setContentIntent(mainActivityPendingIntent)
-        
+
         if (!serviceKilled) {
-            notificationManager.notify(NOTIFICATION_ID, curNotificationBuilder.build())
+            notificationManager.notify(NOTIFICATION_ID, trackingNotificationBuilder.build())
         }
     }
 
