@@ -36,8 +36,8 @@ android {
         applicationId = "com.devhjs.runningtracker"
         minSdk = 24
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
@@ -63,9 +63,15 @@ android {
             )
             
             // Release Configuration: Use Real IDs
-            manifestPlaceholders["ADMOB_APP_ID"] = admobAppIdReal
-            buildConfigField("String", "ADMOB_BANNER_ID", "\"$admobBannerIdReal\"")
-            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$admobInterstitialIdReal\"")
+            // TODO: 정식 배포 시 아래 주석을 해제
+            // manifestPlaceholders["ADMOB_APP_ID"] = admobAppIdReal
+            // buildConfigField("String", "ADMOB_BANNER_ID", "\"$admobBannerIdReal\"")
+            // buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$admobInterstitialIdReal\"")
+
+            // Release Configuration: Use Test IDs (Temporary for internal testing)
+            manifestPlaceholders["ADMOB_APP_ID"] = admobAppIdTest
+            buildConfigField("String", "ADMOB_BANNER_ID", "\"$admobBannerIdTest\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$admobInterstitialIdTest\"")
         }
         debug {
             // Debug Configuration: Use Test IDs
