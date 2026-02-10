@@ -13,8 +13,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 abstract class DataSourceModule {
 
-
-
     @Singleton
     @Binds
     abstract fun bindTempRunDataSource(
