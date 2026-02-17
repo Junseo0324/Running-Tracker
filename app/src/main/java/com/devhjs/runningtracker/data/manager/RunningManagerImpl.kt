@@ -25,7 +25,7 @@ class RunningManagerImpl @Inject constructor(
     private val tempRunDataSource: TempRunDataSource
 ) : RunningManager {
 
-    // 매니저의 생명주기를 관리할 자체 Scope (Application Scope와 유사하게 동작)
+    // 매니저의 생명주기를 관리할 자체 Scope
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private val _isTracking = MutableStateFlow(false)
