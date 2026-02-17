@@ -28,13 +28,20 @@ fun RunScreenRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
+    // 위치 정보 저장
     var initialLocation by remember { mutableStateOf<LatLng?>(null) }
-    
+
+    // Google Map의 카메라 상태 제어
     val cameraPositionState = rememberCameraPositionState()
 
-    LaunchedEffect(true) {
+    // 사용자의 현재 위치를 가져옴
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+
+
+    LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
-            when(event) {
+            when (event) {
                 is RunEvent.Navigate -> onNavigate(event.route)
                 is RunEvent.ServiceAction -> {
                     Intent(context, TrackingService::class.java).also {
@@ -46,9 +53,10 @@ fun RunScreenRoot(
         }
     }
 
-    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+    // 초기 위치 설정
     LaunchedEffect(Unit) {
-        if(state.pathPoints.isEmpty()) {
+        // path가 없을 때 fusedLocationClient 를 사용해 위치 지정
+        if (state.pathPoints.isEmpty()) {
             try {
                 val locationResult = fusedLocationClient.lastLocation
                 locationResult.addOnSuccessListener { location: Location? ->
@@ -56,15 +64,15 @@ fun RunScreenRoot(
                         initialLocation = LatLng(it.latitude, it.longitude)
                     }
                 }
-            } catch (e: SecurityException) {
+            } catch (_: SecurityException) {
             }
         }
     }
-    
-    // Initial Map Center
+
+    // 지도의 중심을 내 위치로 초기화
     LaunchedEffect(initialLocation) {
         initialLocation?.let {
-            if(state.pathPoints.isEmpty()) {
+            if (state.pathPoints.isEmpty()) {
                 cameraPositionState.position = CameraPosition.fromLatLngZoom(
                     it,
                     Constants.MAP_ZOOM
@@ -73,8 +81,9 @@ fun RunScreenRoot(
         }
     }
 
-    // Camera Follow Logic
+    // 카메라 이동
     LaunchedEffect(key1 = state.currentLocation) {
+        // 사용자의 위치가 업데이트될 때마다, camera를 애니메이션으로 이동 처리
         state.currentLocation?.let {
             cameraPositionState.animate(
                 CameraUpdateFactory.newLatLngZoom(it, Constants.MAP_ZOOM)
@@ -82,10 +91,14 @@ fun RunScreenRoot(
         }
     }
 
-    // Keep screen on
-    DisposableEffect(Unit) {
+    // 화면 커짐 유지
+    DisposableEffect(state.isTracking) {
         val window = (context as? android.app.Activity)?.window
-        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        if(state.isTracking) {
+            window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
         onDispose {
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }

@@ -30,7 +30,7 @@ fun StatsCardItem(
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            imageVector = icon, // Placeholder icon
+            imageVector = icon,
             contentDescription = null,
             tint = RunningGreen,
             modifier = Modifier.padding(bottom = 4.dp)

@@ -1,8 +1,6 @@
 package com.devhjs.runningtracker.presentation.run
 
 
-import android.view.WindowManager
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,11 +31,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -63,23 +59,7 @@ fun RunScreen(
     onAction: (RunAction) -> Unit= {},
     cameraPositionState: CameraPositionState = rememberCameraPositionState()
 ) {
-    val context = LocalContext.current
-    
-    DisposableEffect(state.isTracking) {
-        val window = (context as? ComponentActivity)?.window
-        if (state.isTracking) {
-             window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        } else {
-             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
-        
-        onDispose {
-             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
-    }
-
     Box(modifier = Modifier.fillMaxSize()) {
-        // 1. Map Background
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
@@ -98,7 +78,6 @@ fun RunScreen(
             }
         }
 
-        // 2. Overlay Content
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -106,7 +85,6 @@ fun RunScreen(
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // TOP: Timer Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -134,7 +112,6 @@ fun RunScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Stats Row
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
@@ -158,7 +135,6 @@ fun RunScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        // Lock Button
                         IconButton(
                             onClick = { onAction(RunAction.OnToggleLock) },
                             modifier = Modifier
@@ -168,7 +144,6 @@ fun RunScreen(
                             Icon(Icons.Default.Lock, contentDescription = "Lock", tint = TextWhite)
                         }
 
-                        // PAUSE Button
                         Button(
                             onClick = { onAction(RunAction.OnPause) },
                              modifier = Modifier.size(80.dp),
@@ -186,7 +161,6 @@ fun RunScreen(
                          Spacer(modifier = Modifier.size(56.dp)) 
                     }
                 } else if (state.isLocked) {
-                     // Unlock Button (Long press logic in real app, click for now)
                      Button(
                         onClick = { onAction(RunAction.OnToggleLock) },
                         modifier = Modifier
@@ -199,12 +173,10 @@ fun RunScreen(
                         Text("길게 눌러 잠금 해제 (클릭)", color = TextWhite)
                     }
                 } else {
-                    // PAUSED State -> Resume / Stop
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                         // Resume
                         Button(
                             onClick = { onAction(RunAction.OnResume) },
                              modifier = Modifier
@@ -221,7 +193,6 @@ fun RunScreen(
                              }
                         }
 
-                        // Stop (Finish)
                         Button(
                             onClick = { onAction(RunAction.OnFinish) },
                              modifier = Modifier
@@ -242,7 +213,6 @@ fun RunScreen(
             }
         }
         
-        // Paused Overlay (Dimmed background)
         if (!state.isTracking && state.curTimeInMillis > 0L) {
              Box(
                 modifier = Modifier
@@ -259,7 +229,6 @@ fun RunScreen(
             }
         }
 
-        // GPS Disabled Warning
         if (!state.isGpsEnabled) {
             Box(
                 modifier = Modifier
@@ -283,4 +252,34 @@ fun RunScreen(
 @Composable
 private fun RunScreenPreview() {
     RunScreen()
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun RunScreenPreviewGpsEnabled() {
+    RunScreen(
+        state = RunState(isGpsEnabled = false)
+    )
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun RunScreenPreviewIsPaused() {
+    RunScreen(
+        state = RunState(
+            isTracking = false,
+            curTimeInMillis = 1000L
+        )
+    )
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun RunScreenPreviewIsLocked() {
+    RunScreen(
+        state = RunState(isLocked = true)
+    )
 }
