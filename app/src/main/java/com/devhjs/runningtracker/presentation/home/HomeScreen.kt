@@ -33,11 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.devhjs.runningtracker.presentation.components.FullScreenMap
 import com.devhjs.runningtracker.presentation.components.PrimaryButton
-import com.devhjs.runningtracker.ui.theme.RunningBlack
-import com.devhjs.runningtracker.ui.theme.RunningDarkGrey
-import com.devhjs.runningtracker.ui.theme.RunningGreen
-import com.devhjs.runningtracker.ui.theme.TextGrey
-import com.devhjs.runningtracker.ui.theme.TextWhite
+import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
+import com.devhjs.runningtracker.presentation.designsystem.RunningDarkGrey
+import com.devhjs.runningtracker.presentation.designsystem.RunningGreen
+import com.devhjs.runningtracker.presentation.designsystem.TextGrey
+import com.devhjs.runningtracker.presentation.designsystem.TextWhite
 
 
 @Composable

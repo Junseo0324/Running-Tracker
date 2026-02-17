@@ -1,4 +1,4 @@
-package com.devhjs.runningtracker
+package com.devhjs.runningtracker.presentation
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

@@ -44,10 +44,10 @@ import com.devhjs.runningtracker.core.Constants.POLYLINE_WIDTH
 import com.devhjs.runningtracker.core.util.TimeUtils
 import com.devhjs.runningtracker.presentation.components.PrimaryButton
 import com.devhjs.runningtracker.presentation.components.StatsCardItem
-import com.devhjs.runningtracker.ui.theme.RunningBlack
-import com.devhjs.runningtracker.ui.theme.RunningGreen
-import com.devhjs.runningtracker.ui.theme.TextGrey
-import com.devhjs.runningtracker.ui.theme.TextWhite
+import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
+import com.devhjs.runningtracker.presentation.designsystem.RunningGreen
+import com.devhjs.runningtracker.presentation.designsystem.TextGrey
+import com.devhjs.runningtracker.presentation.designsystem.TextWhite
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLngBounds

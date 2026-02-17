@@ -46,9 +46,9 @@ import com.devhjs.runningtracker.core.Constants.POLYLINE_COLOR
 import com.devhjs.runningtracker.core.Constants.POLYLINE_WIDTH
 import com.devhjs.runningtracker.core.util.TimeUtils
 import com.devhjs.runningtracker.presentation.components.StatsCardItem
-import com.devhjs.runningtracker.ui.theme.RunningBlack
-import com.devhjs.runningtracker.ui.theme.RunningGreen
-import com.devhjs.runningtracker.ui.theme.TextWhite
+import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
+import com.devhjs.runningtracker.presentation.designsystem.RunningGreen
+import com.devhjs.runningtracker.presentation.designsystem.TextWhite
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties

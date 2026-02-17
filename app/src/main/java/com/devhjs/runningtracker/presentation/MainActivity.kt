@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import com.devhjs.runningtracker.core.Constants.ACTION_SHOW_TRACKING_FRAGMENT
 import com.devhjs.runningtracker.presentation.navigation.Navigation
 import com.devhjs.runningtracker.presentation.util.AdHelper
-import com.devhjs.runningtracker.ui.theme.RunningTrackerTheme
+import com.devhjs.runningtracker.presentation.designsystem.RunningTrackerTheme
 import com.google.android.gms.ads.MobileAds
 import dagger.hilt.android.AndroidEntryPoint
 

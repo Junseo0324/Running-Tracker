@@ -13,8 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.devhjs.runningtracker.ui.theme.RunningBlack
-import com.devhjs.runningtracker.ui.theme.RunningGreen
+import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
+import com.devhjs.runningtracker.presentation.designsystem.RunningGreen
 
 @Composable
 fun PrimaryButton(

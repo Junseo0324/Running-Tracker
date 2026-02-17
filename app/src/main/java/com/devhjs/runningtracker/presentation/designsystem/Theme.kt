@@ -1,6 +1,5 @@
-package com.devhjs.runningtracker.ui.theme
+package com.devhjs.runningtracker.presentation.designsystem
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

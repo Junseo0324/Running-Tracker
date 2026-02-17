@@ -31,9 +31,9 @@ import androidx.compose.ui.unit.sp
 import com.devhjs.runningtracker.core.util.ImageUtils
 import com.devhjs.runningtracker.core.util.TimeUtils
 import com.devhjs.runningtracker.domain.model.Run
-import com.devhjs.runningtracker.ui.theme.RunningGreen
-import com.devhjs.runningtracker.ui.theme.TextGrey
-import com.devhjs.runningtracker.ui.theme.TextWhite
+import com.devhjs.runningtracker.presentation.designsystem.RunningGreen
+import com.devhjs.runningtracker.presentation.designsystem.TextGrey
+import com.devhjs.runningtracker.presentation.designsystem.TextWhite
 import java.text.SimpleDateFormat
 import java.util.Locale
 

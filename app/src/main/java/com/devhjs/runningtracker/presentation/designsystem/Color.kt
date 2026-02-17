@@ -1,4 +1,4 @@
-package com.devhjs.runningtracker.ui.theme
+package com.devhjs.runningtracker.presentation.designsystem
 
 import androidx.compose.ui.graphics.Color
 

@@ -29,8 +29,8 @@ import com.devhjs.runningtracker.domain.model.Run
 import com.devhjs.runningtracker.presentation.components.AdMobBanner
 import com.devhjs.runningtracker.presentation.components.RunItemCard
 import com.devhjs.runningtracker.presentation.util.AdHelper
-import com.devhjs.runningtracker.ui.theme.RunningBlack
-import com.devhjs.runningtracker.ui.theme.TextWhite
+import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
+import com.devhjs.runningtracker.presentation.designsystem.TextWhite
 
 
 @Composable
