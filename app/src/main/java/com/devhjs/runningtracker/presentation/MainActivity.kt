@@ -10,9 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.devhjs.runningtracker.core.Constants.ACTION_SHOW_TRACKING_FRAGMENT
+import com.devhjs.runningtracker.presentation.designsystem.RunningTrackerTheme
 import com.devhjs.runningtracker.presentation.navigation.Navigation
 import com.devhjs.runningtracker.presentation.util.AdHelper
-import com.devhjs.runningtracker.presentation.designsystem.RunningTrackerTheme
 import com.google.android.gms.ads.MobileAds
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,7 +21,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
+        // 광고 초기화 처리
         MobileAds.initialize(this)
         AdHelper.loadInterstitial(this)
         

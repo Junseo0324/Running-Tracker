@@ -27,19 +27,15 @@ fun HomeScreenRoot(
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
-    
+
+    // 앱 사용 중 필요한 위치 권한 목록
     val foregroundPermissions = listOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION
     )
-    val foregroundPermissionState = rememberMultiplePermissionsState(permissions = foregroundPermissions)
 
-    val backgroundPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-         listOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-    } else {
-        emptyList()
-    }
-    val backgroundPermissionState = rememberMultiplePermissionsState(permissions = backgroundPermission)
+    // permissions 의 승인 상태를 기다리는 객체
+    val foregroundPermissionState = rememberMultiplePermissionsState(permissions = foregroundPermissions)
 
     // Android 13(TIRAMISU) 이상에서 알림 권한 요청
     val notificationPermissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -57,15 +53,9 @@ fun HomeScreenRoot(
         }
     }
 
-    LaunchedEffect(foregroundPermissionState.permissions, backgroundPermissionState.allPermissionsGranted) {
-        // Coarse(대략적) 혹은 Fine(정확한) 위치 권한 중 하나라도 있으면 허용으로 간주
+    // Coarse(대략적) 혹은 Fine(정확한) 위치 권한 중 하나라도 있으면 허용으로 간주
+    LaunchedEffect(foregroundPermissionState.permissions) {
         val isForegroundGranted = foregroundPermissionState.permissions.any { it.status.isGranted }
-        val isBackgroundGranted = if (backgroundPermission.isNotEmpty()) backgroundPermissionState.allPermissionsGranted else true
-        
-        // 엄밀히는 둘 다 있어야 "완벽한 허용"이지만, 앱 사용에는 Foreground만 있어도 "위치 표시"는 됨.
-        // 하지만 트래킹을 위해서는 Background가 필요.
-        // ViewModel에는 "권한이 충분한가"를 전달.
-        // viewModel에게는 Foreground만 있어도 위치 표시는 가능하므로 Foreground 여부 전달
         viewModel.onAction(HomeAction.OnPermissionsResult(isForegroundGranted))
     }
 
@@ -75,7 +65,7 @@ fun HomeScreenRoot(
         onAction = { action ->
             when(action) {
                 HomeAction.OnStartClick -> {
-                    // 1. Check GPS
+                    // gps 체크
                     val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
                     val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                             locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
@@ -87,15 +77,13 @@ fun HomeScreenRoot(
                         return@HomeScreen
                     }
 
-                    // 2. Check Location Permissions
-                    // 하나라도 권한이 있으면 통과
+                    // 위치 권한 확인
                     if (!foregroundPermissionState.permissions.any { it.status.isGranted }) {
-                        // Request Foreground
                         foregroundPermissionState.launchMultiplePermissionRequest()
                         return@HomeScreen
                     }
 
-                    // 3. Check Notification Permission (Android 13+)
+                    // 알림 권한 확인
                     if (notificationPermissionState != null && !notificationPermissionState.status.isGranted) {
                         notificationPermissionState.launchPermissionRequest()
                         return@HomeScreen

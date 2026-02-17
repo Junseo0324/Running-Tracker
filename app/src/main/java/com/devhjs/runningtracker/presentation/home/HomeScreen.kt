@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.devhjs.runningtracker.presentation.components.AdMobBanner
 import com.devhjs.runningtracker.presentation.components.FullScreenMap
 import com.devhjs.runningtracker.presentation.components.PrimaryButton
 import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
@@ -150,7 +151,7 @@ fun HomeScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
             
-            com.devhjs.runningtracker.presentation.components.AdMobBanner()
+            AdMobBanner()
             
             Spacer(modifier = Modifier.height(16.dp))
         }

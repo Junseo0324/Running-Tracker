@@ -3,6 +3,7 @@ package com.devhjs.runningtracker.presentation.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devhjs.runningtracker.domain.location.LocationClient
+import com.devhjs.runningtracker.domain.manager.RunningManager
 import com.devhjs.runningtracker.presentation.navigation.Screen
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,8 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-import com.devhjs.runningtracker.domain.manager.RunningManager
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -71,7 +70,7 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                  _state.update { it.copy(isLocationLoading = false) }
             }
         }
