@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.devhjs.runningtracker.presentation.history.RunHistoryScreenRoot
 import com.devhjs.runningtracker.presentation.home.HomeScreenRoot
 import com.devhjs.runningtracker.presentation.result.ResultScreenRoot
 import com.devhjs.runningtracker.presentation.run.RunScreenRoot
@@ -50,7 +51,7 @@ fun Navigation(
             )
         }
         composable(Screen.RunHistoryScreen.route) {
-             com.devhjs.runningtracker.presentation.history.RunHistoryScreenRoot(
+             RunHistoryScreenRoot(
                  onNavigateUp = { navController.navigateUp() }
              )
         }

@@ -13,36 +13,28 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.devhjs.runningtracker.domain.model.Run
 import com.devhjs.runningtracker.presentation.components.AdMobBanner
 import com.devhjs.runningtracker.presentation.components.RunItemCard
-import com.devhjs.runningtracker.presentation.util.AdHelper
 import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
 import com.devhjs.runningtracker.presentation.designsystem.TextWhite
 
 
 @Composable
 fun RunHistoryScreen(
-    runs: List<Run>,
-    onNavigateUp: () -> Unit
+    state: RunHistoryState = RunHistoryState(),
+    onAction: (RunHistoryAction) -> Unit = {},
 ) {
-    val context = LocalContext.current
-    LaunchedEffect(Unit) {
-        AdHelper.showInterstitial(context)
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,8 +48,14 @@ fun RunHistoryScreen(
                 .padding(bottom = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onNavigateUp) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextWhite)
+            IconButton(onClick = {
+                onAction(RunHistoryAction.OnBackClick)
+            }) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = TextWhite
+                )
             }
             Spacer(modifier = Modifier.width(8.dp))
             Text(
@@ -73,11 +71,17 @@ fun RunHistoryScreen(
             contentPadding = PaddingValues(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(runs) { run ->
+            items(state.runs) { run ->
                 RunItemCard(run)
             }
         }
-        
+
         AdMobBanner()
     }
+}
+
+@Preview
+@Composable
+private fun RunHistoryScreenPreview() {
+    RunHistoryScreen()
 }
