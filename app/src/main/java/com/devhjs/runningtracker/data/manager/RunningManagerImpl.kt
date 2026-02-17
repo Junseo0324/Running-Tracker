@@ -8,8 +8,7 @@ import com.devhjs.runningtracker.domain.manager.RunningManager
 import com.devhjs.runningtracker.service.Polylines
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,11 +21,11 @@ import javax.inject.Singleton
 @Singleton
 class RunningManagerImpl @Inject constructor(
     gpsStatusClient: GpsStatusClient,
-    private val tempRunDataSource: TempRunDataSource
+    private val tempRunDataSource: TempRunDataSource,
+    externalScope: CoroutineScope
 ) : RunningManager {
 
-    // 매니저의 생명주기를 관리할 자체 Scope
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
 
     private val _isTracking = MutableStateFlow(false)
     override val isTracking: StateFlow<Boolean> = _isTracking.asStateFlow()
@@ -37,9 +36,14 @@ class RunningManagerImpl @Inject constructor(
     private val _durationInMillis = MutableStateFlow(0L)
     override val durationInMillis: StateFlow<Long> = _durationInMillis.asStateFlow()
 
+    /**
+     * GPS 상태 감지
+     * SharingStarted.Eagerly : 구독자가 없어도 항상 감시
+     * stateIn : Flow -> StateFlow 로 변환해 UI 가 구독하기 편하게 변경
+     */
     override val isGpsEnabled: StateFlow<Boolean> = gpsStatusClient.getGpsStatusFlow()
         .stateIn(
-            scope = scope,
+            scope = externalScope,
             started = SharingStarted.Eagerly,
             initialValue = true
         )
@@ -52,6 +56,7 @@ class RunningManagerImpl @Inject constructor(
         _isTracking.value = false
     }
 
+    // 기록 종료 & 데이터 초기화
     override suspend fun stopRun() {
         _isTracking.value = false
         _pathPoints.value = mutableListOf()
@@ -59,6 +64,7 @@ class RunningManagerImpl @Inject constructor(
         tempRunDataSource.clearData()
     }
 
+    // 경로 추가
     override suspend fun addLocation(location: Location?) {
         location?.let {
             val pos = LatLng(location.latitude, location.longitude)
@@ -73,6 +79,9 @@ class RunningManagerImpl @Inject constructor(
         }
     }
 
+    /**
+     * 빈 경로 추가 - 선 끊기
+     */
     override suspend fun addEmptyPolyline() {
         _pathPoints.update { currentPoints ->
             val newPoints = currentPoints.toMutableList()
@@ -85,6 +94,8 @@ class RunningManagerImpl @Inject constructor(
         _durationInMillis.value = timeInMillis
     }
 
+
+    // 현재까지의 기록을 임시 저장 (앱이 죽어도 복구할 수 있도록 처리)
     override suspend fun persistState() {
         val serializablePathPoints = _pathPoints.value.map { polyline ->
             polyline.map { latLng -> SerializableLatLng(latLng.latitude, latLng.longitude) }
@@ -92,14 +103,13 @@ class RunningManagerImpl @Inject constructor(
         tempRunDataSource.persistState(_durationInMillis.value, serializablePathPoints)
     }
 
+    // 앱이 다시 켜질 경우 저장해준 데이터를 불러와 데이터를 넣음.
     override suspend fun restoreState() {
         tempRunDataSource.restoreState()?.let { state ->
             _durationInMillis.value = state.timeInMillis
             _pathPoints.value = state.pathPoints.map { polyline ->
                 polyline.map { sLatLng -> LatLng(sLatLng.lat, sLatLng.lng) }.toMutableList()
             }.toMutableList()
-
-            // 복구 시 데이터가 있다면 일시정지 상태나 다름 없지만 명시적으로 정지는 안함 (서비스 로직에 따름)
         }
     }
 }
