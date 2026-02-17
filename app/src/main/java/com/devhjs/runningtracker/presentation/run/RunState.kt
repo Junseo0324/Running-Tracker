@@ -1,7 +1,7 @@
 package com.devhjs.runningtracker.presentation.run
 
+import androidx.compose.runtime.Immutable
 import com.google.android.gms.maps.model.LatLng
-import javax.annotation.concurrent.Immutable
 
 @Immutable
 data class RunState(

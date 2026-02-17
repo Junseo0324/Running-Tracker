@@ -19,10 +19,6 @@ object Constants {
 
     // 타이머가 갱신되는 주기(밀리초)입니다. UI 업데이트 빈도에 영향을 줍니다.
     const val TIMER_UPDATE_INTERVAL = 50L
-    // 일반적인 위치 업데이트 요청 간격(밀리초)입니다.
-    const val LOCATION_UPDATE_INTERVAL = 5000L
-    // 위치 업데이트를 처리할 수 있는 가장 빠른 간격(밀리초)입니다.
-    const val FASTEST_LOCATION_INTERVAL = 2000L
 
     // 지도 경로(Polyline)의 색상입니다. (빨간색)
     const val POLYLINE_COLOR = 0xFFFF0000.toInt() // Red

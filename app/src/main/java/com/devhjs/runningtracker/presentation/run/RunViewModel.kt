@@ -28,15 +28,16 @@ class RunViewModel @Inject constructor(
     val event = _event.asSharedFlow()
 
     init {
+        // 현재 러닝 여부 추적
         viewModelScope.launch {
             runningManager.isTracking.collect { isTracking ->
                  _state.update { it.copy(isTracking = isTracking) }
             }
         }
-        
+
+        // 이동 경로 좌표
         viewModelScope.launch {
             runningManager.pathPoints.collect { pathPoints ->
-                 // Create a new list structure to ensure Compose detects changes
                 val newPathPoints = pathPoints.map { it.toList() }
                 _state.update { 
                     it.copy(
@@ -47,14 +48,16 @@ class RunViewModel @Inject constructor(
                 updateStats()                
             }
         }
-        
+
+        // 러닝 진행 시간 추적
         viewModelScope.launch {
             runningManager.durationInMillis.collect { time ->
                  _state.update { it.copy(curTimeInMillis = time) }
                 updateStats()               
             }
         }
-        
+
+        // GPS 활성 여부 추적
         viewModelScope.launch {
             runningManager.isGpsEnabled.collect { isGpsEnabled ->
                 _state.update { it.copy(isGpsEnabled = isGpsEnabled) }
@@ -86,6 +89,7 @@ class RunViewModel @Inject constructor(
         }
     }
 
+    // 통계 계산 (거리, 평균 속도, 칼로리) 계산
     private fun updateStats() {
         val pathPoints = _state.value.pathPoints
         val curTimeInMillis = _state.value.curTimeInMillis
@@ -101,6 +105,8 @@ class RunViewModel @Inject constructor(
         } else {
             0f
         }
+
+        // 칼로리 : 거리 x 60 으로 처리
         val caloriesBurned = ((distanceInMeters / 1000f) * 60).toInt()
 
         _state.update {
