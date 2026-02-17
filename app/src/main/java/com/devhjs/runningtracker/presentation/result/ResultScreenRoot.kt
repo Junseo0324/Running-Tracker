@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devhjs.runningtracker.service.TrackingService
+import com.devhjs.runningtracker.presentation.util.AdHelper
 
 @Composable
 fun ResultScreenRoot(
@@ -16,6 +17,10 @@ fun ResultScreenRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        AdHelper.showInterstitial(context)
+    }
 
     LaunchedEffect(true) {
         viewModel.event.collect { event ->

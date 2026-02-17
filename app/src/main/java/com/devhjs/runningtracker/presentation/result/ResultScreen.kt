@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.Cable
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Speed
@@ -34,14 +33,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 import com.devhjs.runningtracker.core.Constants.POLYLINE_COLOR
 import com.devhjs.runningtracker.core.Constants.POLYLINE_WIDTH
 import com.devhjs.runningtracker.core.util.TimeUtils
+import com.devhjs.runningtracker.presentation.components.AdMobBanner
 import com.devhjs.runningtracker.presentation.components.PrimaryButton
 import com.devhjs.runningtracker.presentation.components.StatsCardItem
 import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
@@ -49,10 +49,8 @@ import com.devhjs.runningtracker.presentation.designsystem.RunningGreen
 import com.devhjs.runningtracker.presentation.designsystem.TextGrey
 import com.devhjs.runningtracker.presentation.designsystem.TextWhite
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Polyline
@@ -63,15 +61,10 @@ fun ResultScreen(
     state: ResultState= ResultState(),
     onAction: (ResultAction) -> Unit = {}
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    LaunchedEffect(Unit) {
-        com.devhjs.runningtracker.presentation.util.AdHelper.showInterstitial(context)
-    }
-
+    // 지도 위치 제어
     val cameraPositionState = rememberCameraPositionState()
-
-    val localDensity = androidx.compose.ui.platform.LocalDensity.current
-    var googleMap: GoogleMap? by remember { mutableStateOf(null) }
+    val localDensity = LocalDensity.current
+    // 하단 결과 높이 저장 변수
     var bottomCardHeight by remember { mutableStateOf(0.dp) }
 
     LaunchedEffect(key1 = state.pathPoints, key2 = bottomCardHeight) {
@@ -89,7 +82,6 @@ fun ResultScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // 1. Map Background
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
@@ -102,9 +94,7 @@ fun ResultScreen(
                 zoomGesturesEnabled = true
             )
         ) {
-            MapEffect(Unit) { map ->
-                googleMap = map
-            }
+
              state.pathPoints.forEach { polyline ->
                 Polyline(
                     points = polyline,
@@ -114,7 +104,6 @@ fun ResultScreen(
             }
         }
 
-        // 2. Top Bar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -143,7 +132,6 @@ fun ResultScreen(
             )
         }
 
-        // 3. Bottom Summary Card & Ad
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -163,37 +151,35 @@ fun ResultScreen(
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "TOTAL DISTANCE", color = TextGrey, fontSize = 14.sp)
+                    Text(text = "총 거리", color = TextGrey, fontSize = 14.sp)
                     Text(
                         text = "${String.format("%.2f", state.distanceInMeters / 1000f)} km",
                         color = RunningGreen,
-                        fontSize = 48.sp,
+                        fontSize = 34.sp,
                         fontWeight = FontWeight.Bold
                     )
 
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Stats Grid
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        StatsCardItem(label = "Time", value = TimeUtils.getFormattedStopWatchTime(state.timeInMillis), icon = Icons.Default.AccessTime)
-                        StatsCardItem(label = "Avg Pace", value = "${String.format("%.2f", state.avgSpeed)}'", icon= Icons.Default.Speed)
-                    }
                     Spacer(modifier = Modifier.height(16.dp))
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        StatsCardItem(label = "Calories", value = "${state.caloriesBurned}", icon =Icons.Default.LocalFireDepartment)
-                        StatsCardItem(label = "Elevation", value = "0 m", icon = Icons.Default.Cable) // Dummy
+                        StatsCardItem(label = "평균 페이스", value = "${String.format("%.2f", state.avgSpeed)}'", icon= Icons.Default.Speed)
+                        StatsCardItem(label = "칼로리", value = "${state.caloriesBurned}", icon =Icons.Default.LocalFireDepartment)
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        StatsCardItem(label = "시간", value = TimeUtils.getFormattedStopWatchTime(state.timeInMillis), icon = Icons.Default.AccessTime)
                     }
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     PrimaryButton(
-                        text = "Save Workout",
+                        text = "기록 저장",
                         onClick = {
                             onAction(ResultAction.OnSaveClick)
                         }
@@ -201,7 +187,7 @@ fun ResultScreen(
                 }
             }
 
-            com.devhjs.runningtracker.presentation.components.AdMobBanner(
+            AdMobBanner(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
         }
