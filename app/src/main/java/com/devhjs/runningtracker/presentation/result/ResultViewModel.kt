@@ -1,15 +1,20 @@
 package com.devhjs.runningtracker.presentation.result
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import androidx.core.graphics.createBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devhjs.runningtracker.core.Constants
 import com.devhjs.runningtracker.core.util.ImageUtils
 import com.devhjs.runningtracker.core.util.MapUtils
+import com.devhjs.runningtracker.domain.manager.RunningManager
 import com.devhjs.runningtracker.domain.model.Run
 import com.devhjs.runningtracker.domain.repository.MainRepository
-import com.devhjs.runningtracker.domain.manager.RunningManager
 import com.devhjs.runningtracker.presentation.navigation.Screen
-
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,12 +37,8 @@ class ResultViewModel @Inject constructor(
     private val _event = MutableSharedFlow<ResultEvent>()
     val event = _event.asSharedFlow()
 
-    // Assuming ResultScreen is navigated to AFTER tracking is done or just before saving.
-    // However, if TrackingService is still running, we can read values from it.
-    // If ResultScreen is shown, typically tracking is PAUSED or implicitly STOPPED capturing but service alive.
-    
+
     init {
-        // Observe Repository Data to populate ResultState
         viewModelScope.launch {
             runningManager.pathPoints.collect { pathPoints ->
                 _state.update { it.copy(pathPoints = pathPoints) }
@@ -115,22 +116,22 @@ class ResultViewModel @Inject constructor(
         }
     }
 
-    private fun generatePolylineBitmap(): android.graphics.Bitmap {
+    private fun generatePolylineBitmap(): Bitmap {
         val pathPoints = _state.value.pathPoints
         val width = 800
         val height = 800
-        val bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888)
-        val canvas = android.graphics.Canvas(bitmap)
+        val bitmap = createBitmap(width, height)
+        val canvas = Canvas(bitmap)
         
         // Background
-        canvas.drawColor(android.graphics.Color.BLACK) // Or RunningBlack if available, but pure black is fine for "dark mode" look
+        canvas.drawColor(Color.BLACK)
         
         if (pathPoints.isEmpty() || pathPoints.flatten().isEmpty()) return bitmap
 
-        val paint = android.graphics.Paint().apply {
-            color = android.graphics.Color.GREEN // RunningGreen equivalent
+        val paint = Paint().apply {
+            color = Color.GREEN
             strokeWidth = 10f
-            style = android.graphics.Paint.Style.STROKE
+            style = Paint.Style.STROKE
             isAntiAlias = true
         }
 
@@ -142,30 +143,17 @@ class ResultViewModel @Inject constructor(
 
         val latDiff = maxLat - minLat
         val lngDiff = maxLng - minLng
-        val maxDiff = maxOf(latDiff, lngDiff)
-        
-        // Add some padding
+
         val padding = 50f
         val scaleX = (width - padding * 2) / lngDiff
         val scaleY = (height - padding * 2) / latDiff
-        
-        // We want to maintain aspect ratio, so use the smaller scale, 
-        // OR just normalize to the box. 
-        // Using geographic coordinates directly on a flat canvas is a simple projection (Equirectangular).
-        // For small distances (running) it's acceptable.
-        
-        // To properly center and scale:
+
         val scale = minOf(scaleX, scaleY)
 
         pathPoints.forEach { polyline ->
-            val path = android.graphics.Path()
+            val path = Path()
             if (polyline.isNotEmpty()) {
                 val startPoint = polyline[0]
-                // Normalize and scale:
-                // x = (lng - minLng) * scale + padding
-                // y = height - ((lat - minLat) * scale + padding)   (because canvas Y is down, lat Y is up)
-                
-                // Centering adjustment if aspects differ
                 val offsetX = (width - (lngDiff * scale)) / 2
                 val offsetY = (height - (latDiff * scale)) / 2
 
