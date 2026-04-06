@@ -17,7 +17,7 @@ fun RunHistoryScreenRoot(
     val context = LocalContext.current
     
     LaunchedEffect(Unit) {
-        AdHelper.showInterstitial(context)
+        AdHelper.showInterstitialForHistory(context, frequency = 3)
     }
 
     LaunchedEffect(Unit) {

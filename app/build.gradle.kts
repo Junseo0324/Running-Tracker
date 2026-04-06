@@ -134,6 +134,9 @@ dependencies {
     
     // Serialization
     implementation(libs.kotlinx.serialization.json)
+    
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
