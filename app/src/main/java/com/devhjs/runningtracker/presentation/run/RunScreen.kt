@@ -213,7 +213,12 @@ fun RunScreen(
                              Row(verticalAlignment = Alignment.CenterVertically) {
                                  Icon(Icons.Default.PlayArrow, contentDescription = null, tint = RunningBlack)
                                  Spacer(modifier = Modifier.width(8.dp))
-                                 Text("시작", color = RunningBlack, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                 Text(
+                                     text = if (state.curTimeInMillis > 0L) "재개" else "시작", 
+                                     color = RunningBlack, 
+                                     fontSize = 18.sp, 
+                                     fontWeight = FontWeight.Bold
+                                 )
                              }
                         }
 
