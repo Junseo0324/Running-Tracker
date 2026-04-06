@@ -2,6 +2,8 @@ package com.devhjs.runningtracker.presentation.run
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -74,6 +76,22 @@ fun RunScreen(
                     points = polyline,
                     color = Color(POLYLINE_COLOR),
                     width = POLYLINE_WIDTH
+                )
+            }
+        }
+
+        if (!state.isTracking && state.curTimeInMillis > 0L) {
+             Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.4f))
+            ) {
+                Text(
+                    text = "일시정지됨",
+                    color = TextWhite,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
         }
@@ -161,16 +179,22 @@ fun RunScreen(
                          Spacer(modifier = Modifier.size(56.dp)) 
                     }
                 } else if (state.isLocked) {
-                     Button(
-                        onClick = { onAction(RunAction.OnToggleLock) },
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = RunningBlack.copy(alpha=0.9f))
+                            .height(56.dp)
+                            .background(RunningBlack.copy(alpha=0.9f), RoundedCornerShape(100.dp))
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onLongPress = { onAction(RunAction.OnToggleLock) }
+                                )
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
                     ) {
                         Icon(Icons.Default.LockOpen, contentDescription = null, tint = RunningGreen)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("길게 눌러 잠금 해제 (클릭)", color = TextWhite)
+                        Text("길게 눌러 잠금 해제", color = TextWhite, fontWeight = FontWeight.Bold)
                     }
                 } else {
                     Row(
@@ -210,22 +234,6 @@ fun RunScreen(
                         }
                     }
                 }
-            }
-        }
-        
-        if (!state.isTracking && state.curTimeInMillis > 0L) {
-             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.4f))
-            ) {
-                Text(
-                    text = "일시정지됨",
-                    color = TextWhite,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.align(Alignment.Center)
-                )
             }
         }
 
