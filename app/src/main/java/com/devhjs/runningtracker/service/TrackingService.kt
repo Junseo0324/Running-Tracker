@@ -51,10 +51,8 @@ class TrackingService : LifecycleService() {
 
     @Inject
     lateinit var locationClient: LocationClient
-
     @Inject
     lateinit var baseNotificationBuilder: NotificationCompat.Builder
-
     @Inject
     lateinit var runningManager: RunningManager
 
