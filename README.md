@@ -82,10 +82,10 @@ sequenceDiagram
 ```mermaid
 graph LR
     UI[RunScreen / ResultScreen] -->|러닝 완료 및 저장 요청| VM[ViewModel]
-    VM -->|Run 데이터| Rep[MainRepository (Domain)]
-    Rep -->|RunEntity로 매핑| RepImpl[MainRepositoryImpl (Data)]
-    RepImpl -->|Insert Query| Dao[RunDao (Room DB)]
-    Dao -->|Local Storage| DB[(Room Database)]
+    VM -->|Run 데이터| Rep["MainRepository (Domain)"]
+    Rep -->|RunEntity로 매핑| RepImpl["MainRepositoryImpl (Data)"]
+    RepImpl -->|Insert Query| Dao["RunDao (Room DB)"]
+    Dao -->|Local Storage| DB[("Room Database")]
     
     DB -->|Select Query| Dao
     Dao -->|Flow 형태로 조회| RepImpl
