@@ -35,7 +35,7 @@ android {
     defaultConfig {
         applicationId = "com.devhjs.runningtracker"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 5
         versionName = "1.3.0"
 
