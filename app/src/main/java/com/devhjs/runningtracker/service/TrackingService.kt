@@ -113,8 +113,9 @@ class TrackingService : LifecycleService() {
             when (it.action) {
                 ACTION_START_OR_RESUME_SERVICE -> {
                     if (isFirstRun) {
-                        startForegroundService()
-                        isFirstRun = false
+                        if (startForegroundService()) {
+                            isFirstRun = false
+                        }
                     } else {
                         Timber.d("Resuming service...")
                         startTimer()
@@ -236,7 +237,14 @@ class TrackingService : LifecycleService() {
     }
 
     // 포그라운드 서비스 시작 및 알림 채널 생성
-    private fun startForegroundService() {
+    // @return 포그라운드 승격 성공 여부
+    private fun startForegroundService(): Boolean {
+        if (!LocationUtils.hasLocationPermissions(this)) {
+            Timber.e("위치 권한이 없어 포그라운드 서비스를 시작할 수 없습니다. 서비스를 중지합니다.")
+            stopSelf()
+            return false
+        }
+
         startTimer()
         // startTimer 내부에서 isTracking 상태가 변경됨
 
@@ -246,7 +254,16 @@ class TrackingService : LifecycleService() {
             createNotificationChannel(notificationManager)
         }
 
-        startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
+        return try {
+            startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
+            true
+        } catch (e: SecurityException) {
+            Timber.e(e, "startForeground 호출 중 SecurityException 발생, 서비스를 중지합니다.")
+            pauseService()
+            stopForeground(true)
+            stopSelf()
+            false
+        }
     }
 
     // 러닝 상태에 따라 알림창 업데이트 (시간만 표시)

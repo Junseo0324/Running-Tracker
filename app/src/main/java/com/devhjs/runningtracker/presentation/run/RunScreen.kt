@@ -1,8 +1,7 @@
 package com.devhjs.runningtracker.presentation.run
 
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -43,9 +42,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import com.devhjs.runningtracker.core.Constants.POLYLINE_COLOR
 import com.devhjs.runningtracker.core.Constants.POLYLINE_WIDTH
+import com.devhjs.runningtracker.core.util.LocationUtils
 import com.devhjs.runningtracker.core.util.TimeUtils
 import com.devhjs.runningtracker.presentation.components.StatsCardItem
 import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
@@ -66,13 +65,7 @@ fun RunScreen(
     cameraPositionState: CameraPositionState = rememberCameraPositionState()
 ) {
     val context = LocalContext.current
-    val hasLocationPermission = ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.ACCESS_COARSE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
+    val hasLocationPermission = LocationUtils.hasLocationPermissions(context)
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
@@ -215,7 +208,17 @@ fun RunScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Button(
-                            onClick = { onAction(RunAction.OnResume) },
+                            onClick = {
+                                if (LocationUtils.hasLocationPermissions(context)) {
+                                    onAction(RunAction.OnResume)
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "위치 권한이 필요합니다. 설정에서 권한을 허용해주세요.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            },
                              modifier = Modifier
                                  .weight(1f)
                                  .height(56.dp)
