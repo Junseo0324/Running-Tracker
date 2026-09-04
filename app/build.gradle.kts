@@ -91,6 +91,10 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    testOptions {
+        // android.jar 스텁 메서드가 "Stub!" 예외 대신 기본값을 반환하도록 처리
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -139,6 +143,10 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
