@@ -19,12 +19,14 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,10 +39,22 @@ import com.devhjs.runningtracker.presentation.designsystem.TextWhite
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+private val THUMBNAIL_SIZE = 100.dp
+
 @Composable
 fun RunItemCard(run: Run) {
-    val dateFormat = SimpleDateFormat("MM월 dd일 • a h:mm", Locale.KOREA)
-    val dateString = dateFormat.format(run.timestamp)
+    val dateFormat = remember { SimpleDateFormat("MM월 dd일 • a h:mm", Locale.KOREA) }
+    val dateString = remember(run.timestamp) { dateFormat.format(run.timestamp) }
+
+    // 썸네일은 표시 크기에 맞춰 축소 디코딩하고, 리컴포지션마다 다시 만들지 않도록 기억해 둔다.
+    // remember 가 없으면 매 리컴포지션마다 원본 크기의 비트맵이 새로 할당된다.
+    val thumbnailSizePx = with(LocalDensity.current) { THUMBNAIL_SIZE.roundToPx() }
+    val thumbnail = remember(run.img, thumbnailSizePx) {
+        run.img?.let { bytes ->
+            ImageUtils.decodeSampledBitmap(bytes, thumbnailSizePx, thumbnailSizePx)
+                ?.asImageBitmap()
+        }
+    }
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E)),
@@ -104,13 +118,13 @@ fun RunItemCard(run: Run) {
             // Right: Image
             Box(
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(THUMBNAIL_SIZE)
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color.Black)
             ) {
-                run.img?.let {
+                thumbnail?.let {
                     Image(
-                        bitmap = ImageUtils.bytesToBitmap(it).asImageBitmap(),
+                        bitmap = it,
                         contentDescription = "Run Path",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
