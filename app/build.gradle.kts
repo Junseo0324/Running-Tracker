@@ -153,8 +153,16 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // 메모리 누수 탐지 (debug 빌드에만 포함)
+    debugImplementation(libs.leakcanary.android)
 }
 
 kapt {
     correctErrorTypes = true
+}
+
+ksp {
+    // Room 스키마를 JSON 으로 내보내 마이그레이션 안전성을 검증할 수 있게 한다.
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
