@@ -1,38 +1,22 @@
 package com.devhjs.runningtracker.data.mapper
 
-import android.graphics.Bitmap
-import com.devhjs.runningtracker.core.util.ImageUtils
 import com.devhjs.runningtracker.data.local.RunEntity
 import com.devhjs.runningtracker.domain.model.Run
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.unmockkObject
-import io.mockk.verify
-import org.junit.After
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
-import org.junit.Before
 import org.junit.Test
 
 /**
  * [RunEntity] <-> [Run] 매핑 검증.
  *
- * 이미지 변환은 android.graphics.Bitmap 에 의존하므로 [ImageUtils]를 object mock 으로 대체한다.
+ * 이미지는 양쪽 모두 PNG 바이트(ByteArray)로 다루므로 매핑 과정에서 어떤 변환도 일어나지 않는다.
+ * 과거에는 Entity 가 Bitmap 을 들고 있어 매 조회마다 PNG 디코딩 -> 재압축 왕복이 발생했고,
+ * 이것이 저장된 기록 수에 비례해 메모리를 소모하는 원인이었다.
+ * 아래 테스트들은 그 왕복이 다시 들어오는 것을 막는 회귀 방지 장치다.
  */
 class RunMapperTest {
-
-    @Before
-    fun setUp() {
-        mockkObject(ImageUtils)
-    }
-
-    @After
-    fun tearDown() {
-        unmockkObject(ImageUtils)
-    }
 
     @Test
     fun `toDomain은 모든 필드를 그대로 옮긴다`() {
@@ -55,26 +39,23 @@ class RunMapperTest {
     }
 
     @Test
-    fun `toDomain에서 img가 null이면 변환을 시도하지 않고 null을 유지한다`() {
+    fun `toDomain에서 img가 null이면 null을 유지한다`() {
         val entity = RunEntity(img = null)
 
         val run = entity.toDomain()
 
         assertNull(run.img)
-        verify(exactly = 0) { ImageUtils.bitmapToBytes(any()) }
     }
 
     @Test
-    fun `toDomain에서 img가 있으면 ByteArray로 변환한다`() {
-        val bitmap = mockk<Bitmap>()
+    fun `toDomain은 img 바이트를 재인코딩 없이 동일 인스턴스로 전달한다`() {
         val bytes = byteArrayOf(1, 2, 3)
-        every { ImageUtils.bitmapToBytes(bitmap) } returns bytes
-        val entity = RunEntity(img = bitmap)
+        val entity = RunEntity(img = bytes)
 
         val run = entity.toDomain()
 
-        assertArrayEquals(bytes, run.img)
-        verify(exactly = 1) { ImageUtils.bitmapToBytes(bitmap) }
+        // 같은 인스턴스여야 한다. 복사본이라면 어딘가에서 디코딩/재압축이 일어난 것이다.
+        assertSame(bytes, run.img)
     }
 
     @Test
@@ -115,10 +96,8 @@ class RunMapperTest {
     }
 
     @Test
-    fun `toEntity에서 img가 있으면 Bitmap으로 변환한다`() {
-        val bitmap = mockk<Bitmap>()
+    fun `toEntity는 img 바이트를 재인코딩 없이 동일 인스턴스로 전달한다`() {
         val bytes = byteArrayOf(4, 5, 6)
-        every { ImageUtils.bytesToBitmap(bytes) } returns bitmap
         val run = Run(
             timestamp = 0L,
             avgSpeedInKMH = 0f,
@@ -130,23 +109,30 @@ class RunMapperTest {
 
         val entity = run.toEntity()
 
-        assertSame(bitmap, entity.img)
-        verify(exactly = 1) { ImageUtils.bytesToBitmap(bytes) }
+        assertSame(bytes, entity.img)
     }
 
     @Test
-    fun `Entity에서 Domain을 거쳐 다시 Entity로 왕복해도 값이 유지된다`() {
+    fun `Entity에서 Domain을 거쳐 다시 Entity로 왕복해도 이미지 바이트가 보존된다`() {
+        val bytes = byteArrayOf(9, 8, 7, 6, 5)
         val original = RunEntity(
             timestamp = 1_700_000_000_000L,
             avgSpeedInKMH = 8.3f,
             distanceInMeters = 3_200,
             timeInMillis = 1_200_000L,
-            caloriesBurned = 192
+            caloriesBurned = 192,
+            img = bytes
         ).also { it.id = 3 }
 
         val roundTripped = original.toDomain().toEntity()
 
-        assertEquals(original, roundTripped)
+        assertEquals(original.timestamp, roundTripped.timestamp)
+        assertEquals(original.avgSpeedInKMH, roundTripped.avgSpeedInKMH, 0f)
+        assertEquals(original.distanceInMeters, roundTripped.distanceInMeters)
+        assertEquals(original.timeInMillis, roundTripped.timeInMillis)
+        assertEquals(original.caloriesBurned, roundTripped.caloriesBurned)
         assertEquals(original.id, roundTripped.id)
+        assertArrayEquals(bytes, roundTripped.img)
+        assertSame(bytes, roundTripped.img)
     }
 }

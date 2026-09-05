@@ -9,6 +9,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import androidx.core.graphics.createBitmap
+import com.devhjs.runningtracker.core.util.ImageUtils
 import com.devhjs.runningtracker.data.local.RunDAO
 import com.devhjs.runningtracker.data.local.RunEntity
 import com.devhjs.runningtracker.data.local.RunningDatabase
@@ -82,17 +83,20 @@ class SeedRunsReceiver : BroadcastReceiver() {
 
         // 시더 자체가 OOM 되지 않도록 한 건씩 만들고 즉시 해제한다.
         repeat(count) { i ->
+            // 실제 앱과 동일하게 800x800 비트맵을 만들어 PNG 로 압축한 뒤 즉시 해제한다.
             val bitmap = generateDummyPathBitmap()
+            val png = ImageUtils.bitmapToBytes(bitmap)
+            bitmap.recycle()
+
             val entity = RunEntity(
                 timestamp = now - i * ONE_DAY_MILLIS,
                 avgSpeedInKMH = 8f + Random.nextFloat() * 6f,
                 distanceInMeters = 3_000 + Random.nextInt(12_000),
                 timeInMillis = (20L + Random.nextInt(70)) * 60L * 1000L,
                 caloriesBurned = 200 + Random.nextInt(600),
-                img = bitmap
+                img = png
             )
             dao.insertRun(entity)
-            bitmap.recycle()
 
             if ((i + 1) % 10 == 0) Timber.d("  ${i + 1}/$count 삽입 완료")
         }
