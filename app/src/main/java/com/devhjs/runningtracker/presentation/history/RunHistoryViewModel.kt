@@ -28,7 +28,7 @@ class RunHistoryViewModel @Inject constructor(
 
     init {
         mainRepository.getAllRunsSortedByDate().onEach { runs ->
-            _state.update { it.copy(runs = runs) }
+            _state.update { it.copy(runs = runs, isLoaded = true) }
         }.launchIn(viewModelScope)
     }
 

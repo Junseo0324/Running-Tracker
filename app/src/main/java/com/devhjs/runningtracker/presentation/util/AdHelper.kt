@@ -21,6 +21,13 @@ object AdHelper {
     private var interstitialAd: InterstitialAd? = null
     private var isAdLoading = false
 
+    /**
+     * 전면 광고를 미리 불러온다.
+     *
+     * 로드된 [InterstitialAd] 는 static 필드에 보관되므로, Activity 로 로드하면
+     * 광고가 표시될 때까지(끝내 표시되지 않으면 영원히) 그 Activity 가 붙잡힌다.
+     * 표시에는 Activity 가 필요하지만 로드에는 필요 없으므로 applicationContext 를 쓴다.
+     */
     fun loadInterstitial(context: Context) {
         if (interstitialAd != null || isAdLoading) return
 
@@ -28,7 +35,7 @@ object AdHelper {
         val adRequest = AdRequest.Builder().build()
 
         InterstitialAd.load(
-            context,
+            context.applicationContext,
             BuildConfig.ADMOB_INTERSTITIAL_ID,
             adRequest,
             object : InterstitialAdLoadCallback() {
@@ -48,22 +55,26 @@ object AdHelper {
     }
 
     fun showInterstitial(context: Context, onAdDismissed: () -> Unit = {}) {
-        if (interstitialAd != null && context is Activity) {
-            interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+        val ad = interstitialAd
+        if (ad != null && context is Activity) {
+            ad.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
                     Timber.d("Ad dismissed")
+                    ad.fullScreenContentCallback = null
                     interstitialAd = null
                     onAdDismissed()
-                    loadInterstitial(context) // Preload next ad
+                    // 다음 광고는 Activity 가 아닌 application context 로 미리 받아둔다.
+                    loadInterstitial(context.applicationContext)
                 }
 
                 override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                     Timber.e("Ad failed to show: ${p0.message}")
+                    ad.fullScreenContentCallback = null
                     interstitialAd = null
                     onAdDismissed()
                 }
             }
-            interstitialAd?.show(context)
+            ad.show(context)
         } else {
             // If ad is not ready or context is not Activity, just proceed
              Timber.d("Ad not ready or context is not Activity. Ad ready: ${interstitialAd != null}")
