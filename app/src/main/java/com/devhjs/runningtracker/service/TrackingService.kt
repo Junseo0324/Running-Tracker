@@ -5,9 +5,11 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.devhjs.runningtracker.R
@@ -26,8 +28,6 @@ import com.devhjs.runningtracker.domain.manager.RunningManager
 import com.devhjs.runningtracker.presentation.MainActivity
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -80,7 +80,12 @@ class TrackingService : LifecycleService() {
         lifecycleScope.launch {
             // 이전에 저장된 상태가 있다면 복원 시도
             runningManager.restoreState()
-            
+
+            // restoreState() 는 파일 I/O 때문에 실제로 중단(suspend)된다.
+            // 그 사이 onStartCommand 가 도착해 사용자가 이미 러닝을 시작했을 수 있는데,
+            // 그 상태에서 아래 초기화가 실행되면 방금 시작한 러닝을 지워버린다.
+            if (isTimerEnabled) return@launch
+
             // 복원된 데이터가 있다면 로컬 변수 동기화
             val restoredTime = runningManager.durationInMillis.value
             if (restoredTime > 0L) {
@@ -104,6 +109,10 @@ class TrackingService : LifecycleService() {
     }
     
     override fun onDestroy() {
+        // lifecycleScope 가 취소되면서 타이머 코루틴도 함께 정리되지만,
+        // 루프의 종료 조건인 플래그도 명시적으로 내려 둔다.
+        isTimerEnabled = false
+        timerJob = null
         super.onDestroy()
     }
 
@@ -141,8 +150,15 @@ class TrackingService : LifecycleService() {
     private var timeStarted = 0L
     private var lastSecondTimestamp = 0L
 
+    private var timerJob: Job? = null
+
     // 타이머 시작 및 러닝 시작 로직
     private fun startTimer() {
+        // 이미 타이머가 돌고 있으면 새로 만들지 않는다.
+        // ACTION_START_OR_RESUME_SERVICE 가 중복 전달되면 같은 플래그를 공유하는
+        // 루프가 하나 더 생겨 시간이 이중으로 누적되고 빈 폴리라인이 계속 추가된다.
+        if (isTimerEnabled) return
+
         lifecycleScope.launch {
             // 새로운 경로(Polyline) 리스트 추가 및 러닝 상태 시작
             runningManager.addEmptyPolyline()
@@ -152,8 +168,10 @@ class TrackingService : LifecycleService() {
         timeStarted = System.currentTimeMillis()
         isTimerEnabled = true
         
-        // 메인 스레드에서 타이머 코루틴 실행
-        CoroutineScope(Dispatchers.Main).launch {
+        // lifecycleScope 를 쓰면 서비스가 파괴될 때 코루틴도 함께 취소된다.
+        // 기존의 CoroutineScope(Dispatchers.Main) 은 어디에도 묶여있지 않아,
+        // 서비스가 시스템에 의해 종료된 뒤에도 파괴된 인스턴스를 붙잡은 채 계속 돌았다.
+        timerJob = lifecycleScope.launch {
             while (isTimerEnabled) {
                 // 현재 시간과 시작 시간의 차이 계산 (랩 타임)
                 lapTime = System.currentTimeMillis() - timeStarted
@@ -203,11 +221,33 @@ class TrackingService : LifecycleService() {
         serviceKilled = true
         isFirstRun = true
         pauseService()
+
+        // 타이머 코루틴을 취소해 루프 뒤의 `timeRun += lapTime` 이 실행되지 않게 한다.
+        // 이 줄이 나중에 실행되면 아래 초기화가 덮어써진다.
+        timerJob?.cancel()
+        timerJob = null
+        resetTimerState()
+
         lifecycleScope.launch {
             runningManager.stopRun()
         }
-        stopForeground(true)
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         stopSelf()
+    }
+
+    /**
+     * 타이머 누적 상태를 초기화합니다.
+     *
+     * 초기화하지 않으면 같은 프로세스에서 다음 러닝을 시작할 때 lastSecondTimestamp 가
+     * 이전 값을 유지한 채로 남아, 새 러닝 시간이 그 값을 넘어설 때까지
+     * 알림 시간 갱신과 persistState() 가 한 번도 실행되지 않는다.
+     * (= 앱이 죽으면 그 구간의 기록이 통째로 사라진다)
+     */
+    private fun resetTimerState() {
+        lapTime = 0L
+        timeRun = 0L
+        timeStarted = 0L
+        lastSecondTimestamp = 0L
     }
 
     private var locationJob: Job? = null
@@ -255,12 +295,22 @@ class TrackingService : LifecycleService() {
         }
 
         return try {
-            startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
+            // 매니페스트의 foregroundServiceType 과 일치시켜 명시적으로 승격한다.
+            ServiceCompat.startForeground(
+                this,
+                NOTIFICATION_ID,
+                baseNotificationBuilder.build(),
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+                } else {
+                    0
+                }
+            )
             true
         } catch (e: SecurityException) {
             Timber.e(e, "startForeground 호출 중 SecurityException 발생, 서비스를 중지합니다.")
             pauseService()
-            stopForeground(true)
+            ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
             stopSelf()
             false
         }

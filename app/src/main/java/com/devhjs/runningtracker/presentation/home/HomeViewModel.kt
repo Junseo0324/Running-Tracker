@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -56,11 +57,22 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private var locationJob: Job? = null
+
+    /**
+     * 현재 위치 수집을 시작합니다.
+     *
+     * 이전 수집 작업을 반드시 취소합니다. 취소하지 않으면 홈 화면에 재진입할 때마다
+     * (컴포저블이 파괴됐다 다시 만들어지며 LaunchedEffect 가 재실행된다)
+     * 1Hz 고정확도 위치 스트림이 viewModelScope 에 하나씩 영구히 쌓인다.
+     */
     private fun fetchCurrentLocation() {
         if(!_state.value.isPermissionGranted) return
-        
+
+        locationJob?.cancel()
+
         _state.update { it.copy(isLocationLoading = true) }
-        viewModelScope.launch {
+        locationJob = viewModelScope.launch {
             try {
                 locationClient.getLocationFlow().collect { location ->
                     _state.update { state -> 
