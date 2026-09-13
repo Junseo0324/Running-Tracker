@@ -2,7 +2,6 @@ package com.devhjs.runningtracker.data.mapper
 
 import com.devhjs.runningtracker.data.local.RunEntity
 import com.devhjs.runningtracker.domain.model.Run
-import com.devhjs.runningtracker.core.util.ImageUtils
 
 fun RunEntity.toDomain(): Run {
     return Run(
@@ -12,7 +11,7 @@ fun RunEntity.toDomain(): Run {
         distanceInMeters = distanceInMeters,
         timeInMillis = timeInMillis,
         caloriesBurned = caloriesBurned,
-        img = img?.let { ImageUtils.bitmapToBytes(it) }
+        img = img
     )
 }
 
@@ -23,7 +22,7 @@ fun Run.toEntity(): RunEntity {
         distanceInMeters = distanceInMeters,
         timeInMillis = timeInMillis,
         caloriesBurned = caloriesBurned,
-        img = img?.let { ImageUtils.bytesToBitmap(it) }
+        img = img
     ).also {
         it.id = id
     }

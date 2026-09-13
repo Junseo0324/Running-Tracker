@@ -21,7 +21,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -97,19 +99,24 @@ class ResultViewModel @Inject constructor(
 
     private fun saveRun() {
         val currentState = _state.value
-        val mapBitmap = generatePolylineBitmap()
         val timestamp = Calendar.getInstance().timeInMillis
-        
-        val run = Run(
-            timestamp = timestamp,
-            avgSpeedInKMH = currentState.avgSpeed,
-            distanceInMeters = currentState.distanceInMeters.toInt(),
-            timeInMillis = currentState.timeInMillis,
-            caloriesBurned = currentState.caloriesBurned,
-            img = ImageUtils.bitmapToBytes(mapBitmap)
-        )
-        
+
         viewModelScope.launch {
+            // 비트맵 생성과 PNG 압축은 메인 스레드에서 하기엔 무겁다.
+            val img = withContext(Dispatchers.Default) {
+                val bitmap = generatePolylineBitmap()
+                ImageUtils.bitmapToBytes(bitmap).also { bitmap.recycle() }
+            }
+
+            val run = Run(
+                timestamp = timestamp,
+                avgSpeedInKMH = currentState.avgSpeed,
+                distanceInMeters = currentState.distanceInMeters.toInt(),
+                timeInMillis = currentState.timeInMillis,
+                caloriesBurned = currentState.caloriesBurned,
+                img = img
+            )
+
             mainRepository.insertRun(run)
             _event.emit(ResultEvent.StopService(Constants.ACTION_STOP_SERVICE))
             _event.emit(ResultEvent.Navigate(Screen.HomeScreen.route))
@@ -118,8 +125,8 @@ class ResultViewModel @Inject constructor(
 
     private fun generatePolylineBitmap(): Bitmap {
         val pathPoints = _state.value.pathPoints
-        val width = 800
-        val height = 800
+        val width = MAP_SNAPSHOT_SIZE
+        val height = MAP_SNAPSHOT_SIZE
         val bitmap = createBitmap(width, height)
         val canvas = Canvas(bitmap)
         
@@ -172,5 +179,13 @@ class ResultViewModel @Inject constructor(
             }
         }
         return bitmap
+    }
+
+    companion object {
+        /**
+         * 저장할 경로 이미지의 한 변 길이(px).
+         * 목록에서는 100dp 썸네일로만 쓰이므로 xxxhdpi(4x) 기준으로도 400px 이면 충분하다.
+         */
+        private const val MAP_SNAPSHOT_SIZE = 400
     }
 }

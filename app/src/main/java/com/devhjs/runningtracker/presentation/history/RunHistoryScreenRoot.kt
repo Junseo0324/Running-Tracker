@@ -16,8 +16,12 @@ fun RunHistoryScreenRoot(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     
-    LaunchedEffect(Unit) {
-        AdHelper.showInterstitialForHistory(context, frequency = 3)
+    // 목록 로딩이 끝난 뒤에 전면 광고를 띄운다.
+    // 진입과 동시에 띄우면 전체 화면 크리에이티브 할당이 목록 조회의 메모리 피크와 겹친다.
+    LaunchedEffect(state.isLoaded) {
+        if (state.isLoaded) {
+            AdHelper.showInterstitialForHistory(context, frequency = 3)
+        }
     }
 
     LaunchedEffect(Unit) {

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+
+        <!--
+          OOM 재현용 디버그 전용 리시버.
+          adb shell 에서 브로드캐스트를 보내려면 exported 여야 하며,
+          이 매니페스트는 debug 소스셋에만 있으므로 릴리스 빌드에는 병합되지 않는다.
+        -->
+        <receiver
+            android:name=".debug.SeedRunsReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.devhjs.runningtracker.debug.SEED_RUNS" />
+                <action android:name="com.devhjs.runningtracker.debug.CLEAR_RUNS" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>
