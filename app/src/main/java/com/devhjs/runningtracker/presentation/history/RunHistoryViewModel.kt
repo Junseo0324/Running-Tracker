@@ -52,6 +52,11 @@ class RunHistoryViewModel @Inject constructor(
                     _event.emit(RunHistoryEvent.OpenUrl(action.url))
                 }
             }
+            is RunHistoryAction.OnRunClick -> {
+                viewModelScope.launch {
+                    _event.emit(RunHistoryEvent.NavigateToDetail(action.runId))
+                }
+            }
         }
     }
 }

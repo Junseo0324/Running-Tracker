@@ -81,7 +81,10 @@ fun RunHistoryScreen(
                 }
             }
             items(state.runs) { run ->
-                RunItemCard(run)
+                RunItemCard(
+                    run = run,
+                    onClick = { run.id?.let { onAction(RunHistoryAction.OnRunClick(it)) } }
+                )
             }
         }
 

@@ -3,9 +3,12 @@ package com.devhjs.runningtracker.presentation.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.devhjs.runningtracker.presentation.detail.RunDetailScreenRoot
 import com.devhjs.runningtracker.presentation.history.RunHistoryScreenRoot
 import com.devhjs.runningtracker.presentation.home.HomeScreenRoot
 import com.devhjs.runningtracker.presentation.result.ResultScreenRoot
@@ -52,8 +55,21 @@ fun Navigation(
         }
         composable(Screen.RunHistoryScreen.route) {
              RunHistoryScreenRoot(
-                 onNavigateUp = { navController.navigateUp() }
+                 onNavigateUp = { navController.navigateUp() },
+                 onNavigateToDetail = { runId ->
+                     navController.navigate(Screen.RunDetailScreen.createRoute(runId))
+                 }
              )
+        }
+        composable(
+            route = Screen.RunDetailScreen.route,
+            arguments = listOf(
+                navArgument(Screen.RunDetailScreen.ARG_RUN_ID) { type = NavType.IntType }
+            )
+        ) {
+            RunDetailScreenRoot(
+                onNavigateUp = { navController.navigateUp() }
+            )
         }
     }
 }

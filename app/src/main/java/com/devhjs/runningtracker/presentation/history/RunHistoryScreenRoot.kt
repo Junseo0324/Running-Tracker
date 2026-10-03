@@ -12,7 +12,8 @@ import com.devhjs.runningtracker.presentation.util.openExternalUrl
 @Composable
 fun RunHistoryScreenRoot(
     viewModel: RunHistoryViewModel = hiltViewModel(),
-    onNavigateUp: () -> Unit
+    onNavigateUp: () -> Unit,
+    onNavigateToDetail: (Int) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -30,6 +31,7 @@ fun RunHistoryScreenRoot(
             when(event) {
                 RunHistoryEvent.NavigateUp -> onNavigateUp()
                 is RunHistoryEvent.OpenUrl -> context.openExternalUrl(event.url)
+                is RunHistoryEvent.NavigateToDetail -> onNavigateToDetail(event.runId)
             }
         }
     }

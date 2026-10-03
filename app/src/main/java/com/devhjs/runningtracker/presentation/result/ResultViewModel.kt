@@ -124,7 +124,7 @@ class ResultViewModel @Inject constructor(
                 img = img
             )
 
-            mainRepository.insertRun(run)
+            mainRepository.insertRun(run, currentState.pathPoints)
             _event.emit(ResultEvent.StopService(Constants.ACTION_STOP_SERVICE))
             _event.emit(ResultEvent.Navigate(Screen.HomeScreen.route))
         }

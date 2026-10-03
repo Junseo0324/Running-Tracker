@@ -1,6 +1,9 @@
 package com.devhjs.runningtracker.presentation.components
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +19,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -24,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.devhjs.runningtracker.core.Constants.MAP_ZOOM
 import com.devhjs.runningtracker.core.Constants.POLYLINE_COLOR
 import com.devhjs.runningtracker.core.Constants.POLYLINE_WIDTH
+import com.devhjs.runningtracker.core.util.ImageUtils
 import com.devhjs.runningtracker.core.util.TimeUtils
 import com.devhjs.runningtracker.presentation.designsystem.RunningGreen
 import com.devhjs.runningtracker.presentation.designsystem.TextGrey
@@ -150,6 +156,31 @@ fun RouteMap(
                     width = POLYLINE_WIDTH
                 )
             }
+        }
+    }
+}
+
+/**
+ * 경로 좌표가 없는 예전 기록용. 저장 당시 그려둔 경로 이미지를 지도 카드 자리에 보여준다.
+ * 카드 크기에 맞춰 축소 디코딩한다.
+ */
+@Composable
+fun RouteImage(
+    imageBytes: ByteArray?,
+    modifier: Modifier = Modifier
+) {
+    BoxWithConstraints(modifier = modifier.background(Color.Black)) {
+        val sizePx = with(LocalDensity.current) { maxWidth.roundToPx() }
+        val bitmap = remember(imageBytes, sizePx) {
+            imageBytes?.let { ImageUtils.decodeSampledBitmap(it, sizePx, sizePx)?.asImageBitmap() }
+        }
+        bitmap?.let {
+            Image(
+                bitmap = it,
+                contentDescription = "Run Path",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }

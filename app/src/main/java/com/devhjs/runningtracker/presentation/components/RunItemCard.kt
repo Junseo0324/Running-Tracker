@@ -42,7 +42,10 @@ import java.util.Locale
 private val THUMBNAIL_SIZE = 100.dp
 
 @Composable
-fun RunItemCard(run: Run) {
+fun RunItemCard(
+    run: Run,
+    onClick: () -> Unit = {}
+) {
     val dateFormat = remember { SimpleDateFormat("MM월 dd일 • a h:mm", Locale.KOREA) }
     val dateString = remember(run.timestamp) { dateFormat.format(run.timestamp) }
 
@@ -59,6 +62,7 @@ fun RunItemCard(run: Run) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E)),
         shape = RoundedCornerShape(16.dp),
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
