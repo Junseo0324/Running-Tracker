@@ -165,7 +165,7 @@ fun ResultScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        StatsCardItem(label = "평균 페이스", value = "${String.format("%.2f", state.avgSpeed)}'", icon= Icons.Default.Speed)
+                        StatsCardItem(label = "평균 페이스", value = TimeUtils.getFormattedPace(state.avgSpeed), icon= Icons.Default.Speed)
                         StatsCardItem(label = "칼로리", value = "${state.caloriesBurned}", icon =Icons.Default.LocalFireDepartment)
                     }
                     Spacer(modifier = Modifier.height(12.dp))
