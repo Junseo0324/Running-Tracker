@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.devhjs.runningtracker.presentation.util.SystemBarIcons
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -25,6 +26,9 @@ fun HomeScreenRoot(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigate: (String) -> Unit
 ) {
+    // 지도(밝은 배경) 위라 상태바 아이콘을 어둡게
+    SystemBarIcons(darkIcons = true)
+
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
 

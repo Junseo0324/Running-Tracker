@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devhjs.runningtracker.core.Constants
+import com.devhjs.runningtracker.presentation.util.SystemBarIcons
 import com.devhjs.runningtracker.service.TrackingService
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -26,6 +27,9 @@ fun RunScreenRoot(
     viewModel: RunViewModel = hiltViewModel(),
     onNavigate: (String) -> Unit
 ) {
+    // 지도(밝은 배경) 위라 상태바 아이콘을 어둡게
+    SystemBarIcons(darkIcons = true)
+
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -40,6 +41,7 @@ fun RunHistoryScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(RunningBlack)
+            .systemBarsPadding()
             .padding(16.dp)
     ) {
         // App Bar
@@ -60,7 +62,7 @@ fun RunHistoryScreen(
             }
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "저장된 러닝",
+                text = "러닝 기록",
                 color = TextWhite,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold

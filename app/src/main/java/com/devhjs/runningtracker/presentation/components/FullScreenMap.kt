@@ -1,6 +1,7 @@
 package com.devhjs.runningtracker.presentation.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,7 +24,9 @@ fun FullScreenMap(
     modifier: Modifier = Modifier,
     isMyLocationEnabled: Boolean = false,
     isMyLocationButtonEnabled: Boolean = false,
-    currentLocation: LatLng? = null
+    currentLocation: LatLng? = null,
+    /** 지도 UI(내 위치 버튼, 구글 로고)가 가려지지 않도록 비워둘 영역. */
+    contentPadding: PaddingValues = PaddingValues()
 ) {
     val cameraPositionState = rememberCameraPositionState {
          position = CameraPosition.fromLatLngZoom(LatLng(37.5665, 126.9780), MAP_ZOOM)
@@ -50,6 +53,7 @@ fun FullScreenMap(
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
+            contentPadding = contentPadding,
             properties = MapProperties(
                 isMyLocationEnabled = isMyLocationEnabled,
                 isBuildingEnabled = true,

@@ -9,11 +9,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,6 +52,7 @@ import com.devhjs.runningtracker.core.Constants.POLYLINE_WIDTH
 import com.devhjs.runningtracker.core.util.LocationUtils
 import com.devhjs.runningtracker.core.util.TimeUtils
 import com.devhjs.runningtracker.presentation.components.StatsCardItem
+import com.devhjs.runningtracker.presentation.components.StatusBarScrim
 import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
 import com.devhjs.runningtracker.presentation.designsystem.RunningGreen
 import com.devhjs.runningtracker.presentation.designsystem.TextWhite
@@ -71,6 +77,7 @@ fun RunScreen(
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
+            contentPadding = WindowInsets.systemBars.asPaddingValues(),
             properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = false,
@@ -85,6 +92,8 @@ fun RunScreen(
                 )
             }
         }
+
+        StatusBarScrim(modifier = Modifier.align(Alignment.TopCenter))
 
         if (!state.isTracking && state.curTimeInMillis > 0L) {
              Box(
@@ -105,6 +114,7 @@ fun RunScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .systemBarsPadding()
                 .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -263,6 +273,7 @@ fun RunScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.Red.copy(alpha = 0.9f))
+                    .statusBarsPadding()
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
