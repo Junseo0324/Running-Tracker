@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.devhjs.runningtracker.core.Constants
 import com.devhjs.runningtracker.core.util.ImageUtils
 import com.devhjs.runningtracker.core.util.MapUtils
+import com.devhjs.runningtracker.domain.affiliate.CoupangRecommender
 import com.devhjs.runningtracker.domain.manager.RunningManager
 import com.devhjs.runningtracker.domain.model.Run
 import com.devhjs.runningtracker.domain.repository.MainRepository
@@ -78,7 +79,8 @@ class ResultViewModel @Inject constructor(
             it.copy(
                 distanceInMeters = distanceInMeters,
                 avgSpeed = avgSpeed,
-                caloriesBurned = caloriesBurned
+                caloriesBurned = caloriesBurned,
+                coupangRecommendation = CoupangRecommender.forRun(distanceInMeters)
             )
         }
     }
@@ -93,6 +95,11 @@ class ResultViewModel @Inject constructor(
             }
             ResultAction.OnSaveClick -> {
                 saveRun()
+            }
+            is ResultAction.OnCoupangClick -> {
+                viewModelScope.launch {
+                    _event.emit(ResultEvent.OpenUrl(action.url))
+                }
             }
         }
     }

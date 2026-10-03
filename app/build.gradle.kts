@@ -135,6 +135,9 @@ dependencies {
     
     // Timber
     implementation(libs.timber)
+
+    // Coil (쿠팡 추천 상품 이미지)
+    implementation(libs.coil.compose)
     
     // Serialization
     implementation(libs.kotlinx.serialization.json)

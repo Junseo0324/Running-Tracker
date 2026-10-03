@@ -42,6 +42,7 @@ import com.devhjs.runningtracker.core.Constants.POLYLINE_COLOR
 import com.devhjs.runningtracker.core.Constants.POLYLINE_WIDTH
 import com.devhjs.runningtracker.core.util.TimeUtils
 import com.devhjs.runningtracker.presentation.components.AdMobBanner
+import com.devhjs.runningtracker.presentation.components.CoupangPartnersCard
 import com.devhjs.runningtracker.presentation.components.PrimaryButton
 import com.devhjs.runningtracker.presentation.components.StatsCardItem
 import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
@@ -184,6 +185,14 @@ fun ResultScreen(
                             onAction(ResultAction.OnSaveClick)
                         }
                     )
+
+                    state.coupangRecommendation?.let { recommendation ->
+                        Spacer(modifier = Modifier.height(16.dp))
+                        CoupangPartnersCard(
+                            recommendation = recommendation,
+                            onClick = { onAction(ResultAction.OnCoupangClick(recommendation.url)) }
+                        )
+                    }
                 }
             }
 

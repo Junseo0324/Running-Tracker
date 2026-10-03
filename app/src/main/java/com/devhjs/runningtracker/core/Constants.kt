@@ -33,4 +33,26 @@ object Constants {
     const val NOTIFICATION_CHANNEL_NAME = "Tracking"
     // 트래킹 서비스 알림의 고유 ID입니다.
     const val NOTIFICATION_ID = 1
+
+    // 쿠팡 파트너스 카테고리별 고정 링크입니다. (파트너스 센터 > 링크 생성에서 만든 단축 URL)
+    // 비어있는 카테고리는 추천 카드가 표시되지 않습니다.
+    const val COUPANG_LINK_RUNNING_SHOES = "https://link.coupang.com/a/hxZAi6HA96"
+    const val COUPANG_LINK_NUTRITION = "https://link.coupang.com/a/hxZCAHY7bx"
+    const val COUPANG_LINK_GEAR = "https://link.coupang.com/a/hxZF92GTAa"
+    const val COUPANG_LINK_ELECTROLYTE = "https://link.coupang.com/a/hxZyXroK3E"
+    const val COUPANG_LINK_SOCKS = "https://link.coupang.com/a/hxZDZdTayi"
+    const val COUPANG_LINK_APPAREL = "https://link.coupang.com/a/hxZBl0Bc4G"
+    const val COUPANG_LINK_WATCH = "https://link.coupang.com/a/hxZwUlfU72"
+    // 카테고리별 대표 상품 이미지 주소입니다. (파트너스 센터 > 상품 링크 > HTML 의 img src)
+    // 비어있으면 이미지 대신 카테고리 아이콘이 표시됩니다.
+    const val COUPANG_IMAGE_RUNNING_SHOES = "https://img1c.coupangcdn.com/image/affiliate/banner/07a3ae5cdb111e4b1062bb121d25acb3@2x.jpg"
+    const val COUPANG_IMAGE_GEAR = "https://image13.coupangcdn.com/image/affiliate/banner/a837e36c1c8a08f15dd7968700c130f1@2x.jpg"
+    const val COUPANG_IMAGE_NUTRITION = "https://image12.coupangcdn.com/image/affiliate/banner/d7327a7eda61cef396988f7194181c4a@2x.jpg"
+    const val COUPANG_IMAGE_ELECTROLYTE = "https://image6.coupangcdn.com/image/affiliate/banner/0ab2d4934b7ffdb79719f0a9cc06ec53@2x.jpg"
+    const val COUPANG_IMAGE_SOCKS = "https://image15.coupangcdn.com/image/affiliate/banner/b92cdc18110e9cb3610690c9ee8eb620@2x.jpg"
+    const val COUPANG_IMAGE_APPAREL = "https://img2a.coupangcdn.com/image/affiliate/banner/401d54136b234f46d723b70a7af97d00@2x.jpg"
+    const val COUPANG_IMAGE_WATCH = "https://img3c.coupangcdn.com/image/affiliate/banner/64a4cad92c79f80ac284c62e13bbd1d4@2x.jpg"
+    // 공정위 지침상 파트너스 링크 근처에 반드시 표시해야 하는 대가성 문구입니다.
+    const val COUPANG_PARTNERS_DISCLOSURE =
+        "이 게시물은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
 }

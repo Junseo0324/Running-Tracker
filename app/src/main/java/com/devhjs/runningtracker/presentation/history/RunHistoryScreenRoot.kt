@@ -7,6 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devhjs.runningtracker.presentation.util.AdHelper
+import com.devhjs.runningtracker.presentation.util.openExternalUrl
 
 @Composable
 fun RunHistoryScreenRoot(
@@ -28,6 +29,7 @@ fun RunHistoryScreenRoot(
         viewModel.event.collect { event ->
             when(event) {
                 RunHistoryEvent.NavigateUp -> onNavigateUp()
+                is RunHistoryEvent.OpenUrl -> context.openExternalUrl(event.url)
             }
         }
     }
