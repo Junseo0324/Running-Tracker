@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devhjs.runningtracker.domain.affiliate.CoupangRecommender
 import com.devhjs.runningtracker.domain.repository.MainRepository
+import com.devhjs.runningtracker.domain.region.CountryProvider
 import com.devhjs.runningtracker.presentation.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RunDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val mainRepository: MainRepository
+    private val mainRepository: MainRepository,
+    private val countryProvider: CountryProvider
 ) : ViewModel() {
 
     private val runId: Int = checkNotNull(savedStateHandle[Screen.RunDetailScreen.ARG_RUN_ID])
@@ -40,7 +42,7 @@ class RunDetailViewModel @Inject constructor(
                     pathPoints = pathPoints,
                     isLoaded = true,
                     coupangRecommendation = run?.let { r ->
-                        CoupangRecommender.forRun(r.distanceInMeters.toFloat())
+                        CoupangRecommender.forRun(r.distanceInMeters.toFloat(), countryProvider.currentCountryCode())
                     }
                 )
             }

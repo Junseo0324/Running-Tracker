@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,10 +21,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.devhjs.runningtracker.R
 import com.devhjs.runningtracker.presentation.components.AdMobBanner
 import com.devhjs.runningtracker.presentation.components.CoupangPartnersRow
 import com.devhjs.runningtracker.presentation.components.RunItemCard
@@ -40,6 +43,7 @@ fun RunHistoryScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(RunningBlack)
+            .systemBarsPadding()
             .padding(16.dp)
     ) {
         // App Bar
@@ -54,13 +58,13 @@ fun RunHistoryScreen(
             }) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.cd_back),
                     tint = TextWhite
                 )
             }
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "저장된 러닝",
+                text = stringResource(R.string.run_history),
                 color = TextWhite,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold

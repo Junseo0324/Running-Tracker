@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_name">रन ट्रैकिंग</string>
+    <string name="gps_connected">GPS कनेक्टेड</string>
+    <string name="gps_disconnected">GPS बंद है</string>
+    <string name="home_title">आज दौड़ने के लिए तैयार हैं?</string>
+    <string name="home_subtitle">तैयार होने पर स्टार्ट दबाएँ।</string>
+    <string name="start_workout">दौड़ शुरू करें</string>
+    <string name="run_history">दौड़ का रिकॉर्ड</string>
+    <string name="turn_on_gps">कृपया GPS चालू करें।</string>
+    <string name="workout_result">दौड़ का सारांश</string>
+    <string name="save_run">रिकॉर्ड सेव करें</string>
+    <string name="kilometers">किलोमीटर</string>
+    <string name="avg_pace">औसत पेस</string>
+    <string name="time">समय</string>
+    <string name="calories">कैलोरी</string>
+    <string name="paused">रुका हुआ</string>
+    <string name="elapsed_time">बीता समय</string>
+    <string name="hold_to_unlock">अनलॉक करने के लिए दबाकर रखें</string>
+    <string name="location_permission_required">लोकेशन अनुमति ज़रूरी है। कृपया सेटिंग्स में अनुमति दें।</string>
+    <string name="resume">फिर से शुरू करें</string>
+    <string name="start">शुरू करें</string>
+    <string name="finish">खत्म करें</string>
+    <string name="gps_off_banner">GPS बंद है। लोकेशन ट्रैक करने के लिए GPS चालू करें।</string>
+    <string name="run_detail_title">दौड़ का विवरण</string>
+    <string name="delete_run">रिकॉर्ड हटाएँ</string>
+    <string name="run_not_found">रिकॉर्ड नहीं मिला।</string>
+    <string name="delete_run_message">क्या यह दौड़ का रिकॉर्ड हटाना है? हटाया गया रिकॉर्ड वापस नहीं आएगा।</string>
+    <string name="delete">हटाएँ</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="cd_close">बंद करें</string>
+    <string name="cd_back">वापस</string>
+    <string name="cd_run_path">दौड़ का रास्ता</string>
+    <string name="cd_lock">लॉक</string>
+    <string name="cd_pause">रोकें</string>
+</resources>

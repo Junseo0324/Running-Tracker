@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.devhjs.runningtracker.presentation.util.SystemBarIcons
 import com.devhjs.runningtracker.presentation.util.openExternalUrl
 
 @Composable
@@ -13,6 +14,9 @@ fun RunDetailScreenRoot(
     viewModel: RunDetailViewModel = hiltViewModel(),
     onNavigateUp: () -> Unit
 ) {
+    // 어두운 배경이라 상태바 아이콘을 밝게
+    SystemBarIcons(darkIcons = false)
+
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 

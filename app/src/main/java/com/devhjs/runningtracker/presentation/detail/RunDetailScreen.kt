@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -25,10 +26,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.devhjs.runningtracker.R
 import com.devhjs.runningtracker.domain.model.Run
 import com.devhjs.runningtracker.presentation.components.AdMobBanner
 import com.devhjs.runningtracker.presentation.components.CoupangPartnersCard
@@ -39,8 +43,7 @@ import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
 import com.devhjs.runningtracker.presentation.designsystem.RunningDarkGrey
 import com.devhjs.runningtracker.presentation.designsystem.TextGrey
 import com.devhjs.runningtracker.presentation.designsystem.TextWhite
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.devhjs.runningtracker.presentation.util.formatRunDate
 
 /**
  * 저장된 러닝 기록 상세 화면. 결과 화면과 같은 구성이며 저장 버튼 대신 삭제 버튼이 있다.
@@ -51,12 +54,13 @@ fun RunDetailScreen(
     state: RunDetailState = RunDetailState(),
     onAction: (RunDetailAction) -> Unit = {}
 ) {
-    val dateFormat = remember { SimpleDateFormat("yyyy년 MM월 dd일 • a h:mm", Locale.KOREA) }
+    val locale = LocalConfiguration.current.locales[0]
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(RunningBlack)
+            .systemBarsPadding()
     ) {
         Column(
             modifier = Modifier
@@ -73,10 +77,10 @@ fun RunDetailScreen(
                     onClick = { onAction(RunDetailAction.OnBackClick) },
                     modifier = Modifier.align(Alignment.CenterStart)
                 ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = TextWhite)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back), tint = TextWhite)
                 }
                 Text(
-                    text = "러닝 기록",
+                    text = stringResource(R.string.run_detail_title),
                     color = TextWhite,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
@@ -87,7 +91,7 @@ fun RunDetailScreen(
                         onClick = { onAction(RunDetailAction.OnDeleteClick) },
                         modifier = Modifier.align(Alignment.CenterEnd)
                     ) {
-                        Icon(Icons.Default.Delete, contentDescription = "기록 삭제", tint = TextGrey)
+                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete_run), tint = TextGrey)
                     }
                 }
             }
@@ -97,7 +101,7 @@ fun RunDetailScreen(
                 run != null -> {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = remember(run.timestamp) { dateFormat.format(run.timestamp) },
+                        text = remember(run.timestamp, locale) { formatRunDate(run.timestamp, locale, withYear = true) },
                         color = TextGrey,
                         fontSize = 14.sp
                     )
@@ -134,7 +138,7 @@ fun RunDetailScreen(
                 }
                 state.isLoaded -> {
                     Text(
-                        text = "기록을 찾을 수 없어요.",
+                        text = stringResource(R.string.run_not_found),
                         color = TextGrey,
                         modifier = Modifier.padding(top = 48.dp)
                     )
@@ -150,16 +154,16 @@ fun RunDetailScreen(
     if (state.showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { onAction(RunDetailAction.OnDeleteDismiss) },
-            title = { Text("기록 삭제") },
-            text = { Text("이 러닝 기록을 삭제할까요? 삭제한 기록은 되돌릴 수 없어요.") },
+            title = { Text(stringResource(R.string.delete_run)) },
+            text = { Text(stringResource(R.string.delete_run_message)) },
             confirmButton = {
                 TextButton(onClick = { onAction(RunDetailAction.OnDeleteConfirm) }) {
-                    Text("삭제", color = Color(0xFFFF5252))
+                    Text(stringResource(R.string.delete), color = Color(0xFFFF5252))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { onAction(RunDetailAction.OnDeleteDismiss) }) {
-                    Text("취소", color = TextWhite)
+                    Text(stringResource(R.string.cancel), color = TextWhite)
                 }
             },
             containerColor = RunningDarkGrey,

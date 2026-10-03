@@ -18,7 +18,6 @@ import com.devhjs.runningtracker.core.Constants.ACTION_PAUSE_SERVICE
 import com.devhjs.runningtracker.core.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.devhjs.runningtracker.core.Constants.ACTION_STOP_SERVICE
 import com.devhjs.runningtracker.core.Constants.NOTIFICATION_CHANNEL_ID
-import com.devhjs.runningtracker.core.Constants.NOTIFICATION_CHANNEL_NAME
 import com.devhjs.runningtracker.core.Constants.NOTIFICATION_ID
 import com.devhjs.runningtracker.core.Constants.TIMER_UPDATE_INTERVAL
 import com.devhjs.runningtracker.core.util.LocationUtils
@@ -28,11 +27,11 @@ import com.devhjs.runningtracker.domain.manager.RunningManager
 import com.devhjs.runningtracker.presentation.MainActivity
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 typealias Polyline = MutableList<LatLng>
 typealias Polylines = MutableList<Polyline>
@@ -327,7 +326,7 @@ class TrackingService : LifecycleService() {
             .setAutoCancel(false)
             .setOngoing(true)
             .setSmallIcon(R.drawable.workout_run)
-            .setContentTitle("Running Tracker")
+            .setContentTitle(getString(R.string.notification_title))
             .setContentText(formattedTime)
             .setContentIntent(mainActivityPendingIntent)
 
@@ -340,7 +339,7 @@ class TrackingService : LifecycleService() {
     private fun createNotificationChannel(notificationManager: NotificationManager) {
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
-            NOTIFICATION_CHANNEL_NAME,
+            getString(R.string.notification_channel_name),
             NotificationManager.IMPORTANCE_LOW
         )
         notificationManager.createNotificationChannel(channel)

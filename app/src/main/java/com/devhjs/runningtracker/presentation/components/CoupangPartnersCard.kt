@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -37,13 +37,14 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.devhjs.runningtracker.core.Constants.COUPANG_PARTNERS_DISCLOSURE
+import com.devhjs.runningtracker.R
 import com.devhjs.runningtracker.domain.affiliate.CoupangCategory
 import com.devhjs.runningtracker.domain.affiliate.CoupangRecommendation
 import com.devhjs.runningtracker.presentation.designsystem.RunningDarkGrey
@@ -80,7 +81,7 @@ fun CoupangPartnersCard(
                         .clip(RoundedCornerShape(8.dp))
                         .background(RunningWhite)
                 ) {
-                    ProductImage(imageUrl, recommendation.title)
+                    ProductImage(imageUrl, recommendation.title())
                 }
             } else {
                 CategoryBadge(recommendation.category)
@@ -88,16 +89,16 @@ fun CoupangPartnersCard(
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = recommendation.title,
+                    text = recommendation.title(),
                     color = TextWhite,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Text(text = recommendation.message, color = TextGrey, fontSize = 13.sp)
+                Text(text = recommendation.message(), color = TextGrey, fontSize = 13.sp)
             }
             Icon(
                 Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "쿠팡에서 보기",
+                contentDescription = stringResource(R.string.coupang_view),
                 tint = TextGrey
             )
         }
@@ -116,7 +117,7 @@ fun CoupangPartnersRow(
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = "러닝 용품 추천",
+            text = stringResource(R.string.coupang_section_title),
             color = TextWhite,
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
@@ -143,14 +144,14 @@ fun CoupangPartnersRow(
                         contentAlignment = Alignment.Center
                     ) {
                         if (imageUrl != null) {
-                            ProductImage(imageUrl, recommendation.title)
+                            ProductImage(imageUrl, recommendation.title())
                         } else {
                             CategoryBadge(recommendation.category)
                         }
                     }
                     Column(modifier = Modifier.padding(12.dp)) {
                         Text(
-                            text = recommendation.title,
+                            text = recommendation.title(),
                             color = TextWhite,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
@@ -158,7 +159,7 @@ fun CoupangPartnersRow(
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = recommendation.message,
+                            text = recommendation.message(),
                             color = TextGrey,
                             fontSize = 12.sp,
                             lineHeight = 16.sp,
@@ -209,6 +210,34 @@ private fun CategoryBadge(category: CoupangCategory) {
             modifier = Modifier.size(22.dp)
         )
     }
+}
+
+@Composable
+private fun CoupangRecommendation.title(): String = stringResource(category.titleRes())
+
+@Composable
+private fun CoupangRecommendation.message(): String =
+    shoeMileageKm?.let { stringResource(R.string.coupang_shoe_mileage, it.toInt()) }
+        ?: stringResource(category.messageRes())
+
+private fun CoupangCategory.titleRes(): Int = when (this) {
+    CoupangCategory.RUNNING_SHOES -> R.string.coupang_shoes_title
+    CoupangCategory.GEAR -> R.string.coupang_gear_title
+    CoupangCategory.NUTRITION -> R.string.coupang_nutrition_title
+    CoupangCategory.ELECTROLYTE -> R.string.coupang_electrolyte_title
+    CoupangCategory.SOCKS -> R.string.coupang_socks_title
+    CoupangCategory.APPAREL -> R.string.coupang_apparel_title
+    CoupangCategory.WATCH -> R.string.coupang_watch_title
+}
+
+private fun CoupangCategory.messageRes(): Int = when (this) {
+    CoupangCategory.RUNNING_SHOES -> R.string.coupang_shoes_message
+    CoupangCategory.GEAR -> R.string.coupang_gear_message
+    CoupangCategory.NUTRITION -> R.string.coupang_nutrition_message
+    CoupangCategory.ELECTROLYTE -> R.string.coupang_electrolyte_message
+    CoupangCategory.SOCKS -> R.string.coupang_socks_message
+    CoupangCategory.APPAREL -> R.string.coupang_apparel_message
+    CoupangCategory.WATCH -> R.string.coupang_watch_message
 }
 
 private fun CoupangCategory.icon(): ImageVector = when (this) {
@@ -268,7 +297,7 @@ private val SockIcon: ImageVector by lazy {
 @Composable
 private fun CoupangDisclosure() {
     Text(
-        text = COUPANG_PARTNERS_DISCLOSURE,
+        text = stringResource(R.string.coupang_disclosure),
         color = TextGrey,
         fontSize = 10.sp,
         lineHeight = 13.sp,
@@ -282,9 +311,8 @@ private fun CoupangPartnersCardPreview() {
     CoupangPartnersCard(
         recommendation = CoupangRecommendation(
             category = CoupangCategory.RUNNING_SHOES,
-            title = "러닝화",
-            message = "누적 523km 달성! 러닝화를 점검해볼 때예요",
-            url = ""
+            url = "",
+            shoeMileageKm = 523
         ),
         onClick = {}
     )
@@ -295,7 +323,7 @@ private fun CoupangPartnersCardPreview() {
 private fun CoupangPartnersRowPreview() {
     CoupangPartnersRow(
         recommendations = CoupangCategory.entries.map {
-            CoupangRecommendation(it, it.title, it.message, url = "")
+            CoupangRecommendation(it, url = "")
         },
         onClick = {}
     )

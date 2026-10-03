@@ -1,3 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RunningTracker</string>
+    <string name="app_name" translatable="false">RunningTracker</string>
+    <string name="notification_title" translatable="false">Running Tracker</string>
+
+    <string name="notification_channel_name">Run tracking</string>
+    <string name="gps_connected">GPS connected</string>
+    <string name="gps_disconnected">GPS off</string>
+    <string name="home_title">Ready for a run today?</string>
+    <string name="home_subtitle">Tap start when you\'re ready.</string>
+    <string name="start_workout">Start run</string>
+    <string name="run_history">Run history</string>
+    <string name="turn_on_gps">Please turn on GPS.</string>
+    <string name="workout_result">Run summary</string>
+    <string name="save_run">Save run</string>
+    <string name="kilometers">Kilometers</string>
+    <string name="avg_pace">Avg. pace</string>
+    <string name="time">Time</string>
+    <string name="calories">Calories</string>
+    <string name="paused">Paused</string>
+    <string name="elapsed_time">Elapsed time</string>
+    <string name="hold_to_unlock">Hold to unlock</string>
+    <string name="location_permission_required">Location permission is required. Please allow it in Settings.</string>
+    <string name="resume">Resume</string>
+    <string name="start">Start</string>
+    <string name="finish">Finish</string>
+    <string name="gps_off_banner">GPS is off. Turn on GPS to track your location.</string>
+    <string name="run_detail_title">Run details</string>
+    <string name="delete_run">Delete run</string>
+    <string name="run_not_found">Run not found.</string>
+    <string name="delete_run_message">Delete this run? This can\'t be undone.</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="cd_close">Close</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_run_path">Run path</string>
+    <string name="cd_lock">Lock</string>
+    <string name="cd_pause">Pause</string>
 </resources>

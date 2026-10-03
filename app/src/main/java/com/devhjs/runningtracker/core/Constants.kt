@@ -29,8 +29,6 @@ object Constants {
 
     // 알림 채널을 식별하는 고유 ID입니다.
     const val NOTIFICATION_CHANNEL_ID = "tracking_channel"
-    // 사용자에게 표시되는 알림 채널의 이름입니다. 시스템 설정에서 확인 가능합니다.
-    const val NOTIFICATION_CHANNEL_NAME = "Tracking"
     // 트래킹 서비스 알림의 고유 ID입니다.
     const val NOTIFICATION_ID = 1
 
@@ -52,7 +50,4 @@ object Constants {
     const val COUPANG_IMAGE_SOCKS = "https://image15.coupangcdn.com/image/affiliate/banner/b92cdc18110e9cb3610690c9ee8eb620@2x.jpg"
     const val COUPANG_IMAGE_APPAREL = "https://img2a.coupangcdn.com/image/affiliate/banner/401d54136b234f46d723b70a7af97d00@2x.jpg"
     const val COUPANG_IMAGE_WATCH = "https://img3c.coupangcdn.com/image/affiliate/banner/64a4cad92c79f80ac284c62e13bbd1d4@2x.jpg"
-    // 공정위 지침상 파트너스 링크 근처에 반드시 표시해야 하는 대가성 문구입니다.
-    const val COUPANG_PARTNERS_DISCLOSURE =
-        "이 게시물은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
 }

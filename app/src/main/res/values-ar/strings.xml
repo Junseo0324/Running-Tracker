@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_name">تتبع الجري</string>
+    <string name="gps_connected">GPS متصل</string>
+    <string name="gps_disconnected">GPS غير متصل</string>
+    <string name="home_title">مستعد للجري اليوم؟</string>
+    <string name="home_subtitle">اضغط على ابدأ عندما تكون مستعدًا.</string>
+    <string name="start_workout">ابدأ الجري</string>
+    <string name="run_history">سجل الجري</string>
+    <string name="turn_on_gps">يرجى تشغيل GPS.</string>
+    <string name="workout_result">ملخص الجري</string>
+    <string name="save_run">حفظ الجري</string>
+    <string name="kilometers">كيلومتر</string>
+    <string name="avg_pace">متوسط الوتيرة</string>
+    <string name="time">الوقت</string>
+    <string name="calories">السعرات</string>
+    <string name="paused">متوقف مؤقتًا</string>
+    <string name="elapsed_time">الوقت المنقضي</string>
+    <string name="hold_to_unlock">اضغط مطولًا لإلغاء القفل</string>
+    <string name="location_permission_required">إذن الموقع مطلوب. يرجى السماح به من الإعدادات.</string>
+    <string name="resume">استئناف</string>
+    <string name="start">ابدأ</string>
+    <string name="finish">إنهاء</string>
+    <string name="gps_off_banner">GPS متوقف. شغّل GPS لتتبع موقعك.</string>
+    <string name="run_detail_title">تفاصيل الجري</string>
+    <string name="delete_run">حذف الجري</string>
+    <string name="run_not_found">لم يتم العثور على السجل.</string>
+    <string name="delete_run_message">هل تريد حذف هذا الجري؟ لا يمكن التراجع عن الحذف.</string>
+    <string name="delete">حذف</string>
+    <string name="cancel">إلغاء</string>
+    <string name="cd_close">إغلاق</string>
+    <string name="cd_back">رجوع</string>
+    <string name="cd_run_path">مسار الجري</string>
+    <string name="cd_lock">قفل</string>
+    <string name="cd_pause">إيقاف مؤقت</string>
+</resources>

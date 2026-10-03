@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devhjs.runningtracker.domain.affiliate.CoupangRecommender
 import com.devhjs.runningtracker.domain.repository.MainRepository
+import com.devhjs.runningtracker.domain.region.CountryProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,8 +19,11 @@ import javax.inject.Inject
 @HiltViewModel
 class RunHistoryViewModel @Inject constructor(
     // init 블록에서 데이터를 가져온 후에 쓰지 않기 때문에 파라미터로 사용
-    mainRepository: MainRepository
+    mainRepository: MainRepository,
+    countryProvider: CountryProvider
 ) : ViewModel() {
+
+    private val countryCode = countryProvider.currentCountryCode()
 
     private val _state = MutableStateFlow(RunHistoryState())
     val state = _state.asStateFlow()
@@ -34,7 +38,7 @@ class RunHistoryViewModel @Inject constructor(
                 it.copy(
                     runs = runs,
                     isLoaded = true,
-                    coupangRecommendations = CoupangRecommender.forHistory(totalDistance)
+                    coupangRecommendations = CoupangRecommender.forHistory(totalDistance, countryCode)
                 )
             }
         }.launchIn(viewModelScope)

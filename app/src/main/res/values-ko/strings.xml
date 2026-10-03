@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_name">러닝 트래킹</string>
+    <string name="gps_connected">GPS 연결됨</string>
+    <string name="gps_disconnected">GPS 연결 안 됨</string>
+    <string name="home_title">오늘도 달려볼까요?</string>
+    <string name="home_subtitle">준비가 되면 시작 버튼을 눌러주세요.</string>
+    <string name="start_workout">운동 시작</string>
+    <string name="run_history">러닝 기록</string>
+    <string name="turn_on_gps">GPS를 켜주세요.</string>
+    <string name="workout_result">운동 결과</string>
+    <string name="save_run">기록 저장</string>
+    <string name="kilometers">킬로미터</string>
+    <string name="avg_pace">평균 페이스</string>
+    <string name="time">시간</string>
+    <string name="calories">칼로리</string>
+    <string name="paused">일시정지됨</string>
+    <string name="elapsed_time">운동 시간</string>
+    <string name="hold_to_unlock">길게 눌러 잠금 해제</string>
+    <string name="location_permission_required">위치 권한이 필요합니다. 설정에서 권한을 허용해주세요.</string>
+    <string name="resume">재개</string>
+    <string name="start">시작</string>
+    <string name="finish">종료</string>
+    <string name="gps_off_banner">GPS가 꺼져있습니다. 위치 추적을 위해 GPS를 켜주세요.</string>
+    <string name="run_detail_title">러닝 기록</string>
+    <string name="delete_run">기록 삭제</string>
+    <string name="run_not_found">기록을 찾을 수 없어요.</string>
+    <string name="delete_run_message">이 러닝 기록을 삭제할까요? 삭제한 기록은 되돌릴 수 없어요.</string>
+    <string name="delete">삭제</string>
+    <string name="cancel">취소</string>
+    <string name="cd_close">닫기</string>
+    <string name="cd_back">뒤로</string>
+    <string name="cd_run_path">러닝 경로</string>
+    <string name="cd_lock">잠금</string>
+    <string name="cd_pause">일시정지</string>
+</resources>

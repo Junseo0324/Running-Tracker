@@ -7,10 +7,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -27,13 +31,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.devhjs.runningtracker.R
 import com.devhjs.runningtracker.presentation.components.AdMobBanner
 import com.devhjs.runningtracker.presentation.components.FullScreenMap
 import com.devhjs.runningtracker.presentation.components.PrimaryButton
+import com.devhjs.runningtracker.presentation.components.StatusBarScrim
 import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
 import com.devhjs.runningtracker.presentation.designsystem.RunningDarkGrey
 import com.devhjs.runningtracker.presentation.designsystem.RunningGreen
@@ -50,13 +57,16 @@ fun HomeScreen(
         FullScreenMap(
             isMyLocationEnabled = state.isPermissionGranted,
             isMyLocationButtonEnabled = true,
-            currentLocation = state.currentLocation
+            currentLocation = state.currentLocation,
+            contentPadding = WindowInsets.systemBars.asPaddingValues()
         )
+        StatusBarScrim(modifier = Modifier.align(Alignment.TopCenter))
 
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
+                .navigationBarsPadding()
                 .padding(16.dp)
         ) {
             if(state.isPermissionGranted) {
@@ -85,7 +95,7 @@ fun HomeScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = if (state.isGpsEnabled) "GPS 연결됨" else "GPS 연결 안 됨",
+                                text = stringResource(if (state.isGpsEnabled) R.string.gps_connected else R.string.gps_disconnected),
                                 color = TextWhite,
                                 style = MaterialTheme.typography.labelMedium
                             )
@@ -104,7 +114,7 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "오늘도 달려볼까요?",
+                        text = stringResource(R.string.home_title),
                         color = TextWhite,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -113,7 +123,7 @@ fun HomeScreen(
                             .padding(bottom = 8.dp)
                     )
                      Text(
-                        text = "준비가 되면 시작 버튼을 눌러주세요.",
+                        text = stringResource(R.string.home_subtitle),
                         color = TextGrey,
                         fontSize = 14.sp,
                         modifier = Modifier
@@ -122,7 +132,7 @@ fun HomeScreen(
                     )
 
                     PrimaryButton(
-                        text = "운동 시작",
+                        text = stringResource(R.string.start_workout),
                         onClick = {
                             onAction(HomeAction.OnStartClick)
                         }
@@ -142,7 +152,7 @@ fun HomeScreen(
                         border = BorderStroke(1.dp, RunningGreen)
                     ) {
                         Text(
-                            text = "저장된 러닝",
+                            text = stringResource(R.string.run_history),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold
                         )
