@@ -49,4 +49,24 @@ class TimeUtilsTest {
 
         assertEquals("25:00:00", TimeUtils.getFormattedStopWatchTime(ms))
     }
+
+    @Test
+    fun `시속 10km 는 6분 00초 페이스다`() {
+        assertEquals("6'00\"", TimeUtils.getFormattedPace(10f))
+    }
+
+    @Test
+    fun `시속 11_03km 는 5분 26초 페이스다`() {
+        assertEquals("5'26\"", TimeUtils.getFormattedPace(11.03f))
+    }
+
+    @Test
+    fun `속도가 0 이면 빈 페이스를 표시한다`() {
+        assertEquals("-'--\"", TimeUtils.getFormattedPace(0f))
+    }
+
+    @Test
+    fun `1km 에 100분 이상 걸리는 속도는 빈 페이스를 표시한다`() {
+        assertEquals("-'--\"", TimeUtils.getFormattedPace(0.5f))
+    }
 }

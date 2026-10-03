@@ -141,7 +141,7 @@ fun RunScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         StatsCardItem(label = "km", value = String.format("%.2f", state.distanceInMeters / 1000f), icon= Icons.Default.Speed)
-                        StatsCardItem(label = "평균 페이스", value = if (state.avgSpeed > 0) String.format("%.1f", state.avgSpeed) else "0.0", icon= Icons.Default.Speed)
+                        StatsCardItem(label = "평균 페이스", value = TimeUtils.getFormattedPace(state.avgSpeed), icon= Icons.Default.Speed)
                         StatsCardItem(label = "kcal", value = "${state.caloriesBurned}", icon =Icons.Default.LocalFireDepartment)
                     }
                 }

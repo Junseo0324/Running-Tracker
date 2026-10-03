@@ -2,6 +2,7 @@ package com.devhjs.runningtracker.presentation.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.devhjs.runningtracker.domain.affiliate.CoupangRecommender
 import com.devhjs.runningtracker.domain.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,7 +29,14 @@ class RunHistoryViewModel @Inject constructor(
 
     init {
         mainRepository.getAllRunsSortedByDate().onEach { runs ->
-            _state.update { it.copy(runs = runs, isLoaded = true) }
+            val totalDistance = runs.sumOf { it.distanceInMeters.toLong() }
+            _state.update {
+                it.copy(
+                    runs = runs,
+                    isLoaded = true,
+                    coupangRecommendations = CoupangRecommender.forHistory(totalDistance)
+                )
+            }
         }.launchIn(viewModelScope)
     }
 
@@ -37,6 +45,16 @@ class RunHistoryViewModel @Inject constructor(
             RunHistoryAction.OnBackClick -> {
                 viewModelScope.launch {
                     _event.emit(RunHistoryEvent.NavigateUp)
+                }
+            }
+            is RunHistoryAction.OnCoupangClick -> {
+                viewModelScope.launch {
+                    _event.emit(RunHistoryEvent.OpenUrl(action.url))
+                }
+            }
+            is RunHistoryAction.OnRunClick -> {
+                viewModelScope.launch {
+                    _event.emit(RunHistoryEvent.NavigateToDetail(action.runId))
                 }
             }
         }

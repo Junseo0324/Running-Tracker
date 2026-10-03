@@ -109,6 +109,7 @@ class SeedRunsReceiver : BroadcastReceiver() {
      * 여기서는 쓸 수 없다. Room 의 무효화 트리거는 raw DELETE 에도 동작하므로 UI 는 정상 갱신된다.
      */
     private fun clear(database: RunningDatabase) {
+        database.openHelper.writableDatabase.execSQL("DELETE FROM run_path")
         database.openHelper.writableDatabase.execSQL("DELETE FROM running_table")
         Timber.d("모든 러닝 기록 삭제 완료")
     }

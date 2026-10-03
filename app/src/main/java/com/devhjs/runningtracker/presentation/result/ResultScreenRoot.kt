@@ -9,6 +9,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devhjs.runningtracker.service.TrackingService
 import com.devhjs.runningtracker.presentation.util.AdHelper
+import com.devhjs.runningtracker.presentation.util.openExternalUrl
 
 @Composable
 fun ResultScreenRoot(
@@ -33,6 +34,9 @@ fun ResultScreenRoot(
                         it.action = event.action
                         context.startService(it)
                     }
+                }
+                is ResultEvent.OpenUrl -> {
+                    context.openExternalUrl(event.url)
                 }
             }
         }

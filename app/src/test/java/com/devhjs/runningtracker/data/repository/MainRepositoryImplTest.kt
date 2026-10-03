@@ -2,8 +2,10 @@ package com.devhjs.runningtracker.data.repository
 
 import app.cash.turbine.test
 import com.devhjs.runningtracker.data.local.RunDAO
+import com.devhjs.runningtracker.core.util.PolylineEncoder
 import com.devhjs.runningtracker.data.local.RunEntity
 import com.devhjs.runningtracker.domain.model.Run
+import com.google.android.gms.maps.model.LatLng
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -14,6 +16,8 @@ import io.mockk.slot
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -51,25 +55,55 @@ class MainRepositoryImplTest {
     @Test
     fun `insertRun은 Run을 Entity로 변환해 DAO에 위임한다`() = runTest {
         val captured = slot<RunEntity>()
-        coEvery { runDao.insertRun(capture(captured)) } just Runs
+        coEvery { runDao.insertRunWithPath(capture(captured), any()) } just Runs
 
         repository.insertRun(run)
 
-        coVerify(exactly = 1) { runDao.insertRun(any()) }
+        coVerify(exactly = 1) { runDao.insertRunWithPath(any(), "") }
         assertEquals(1, captured.captured.id)
         assertEquals(run.timestamp, captured.captured.timestamp)
         assertEquals(run.distanceInMeters, captured.captured.distanceInMeters)
     }
 
     @Test
-    fun `deleteRun은 Run을 Entity로 변환해 DAO에 위임한다`() = runTest {
+    fun `insertRun은 경로를 인코딩해 기록과 함께 저장한다`() = runTest {
+        val path = listOf(listOf(LatLng(37.5, 127.0), LatLng(37.501, 127.001)))
+        val encoded = slot<String>()
+        coEvery { runDao.insertRunWithPath(any(), capture(encoded)) } just Runs
+
+        repository.insertRun(run, path)
+
+        assertEquals(PolylineEncoder.encodePath(path), encoded.captured)
+    }
+
+    @Test
+    fun `deleteRun은 기록과 경로를 함께 지우도록 DAO에 위임한다`() = runTest {
         val captured = slot<RunEntity>()
-        coEvery { runDao.deleteRun(capture(captured)) } just Runs
+        coEvery { runDao.deleteRunWithPath(capture(captured)) } just Runs
 
         repository.deleteRun(run)
 
-        coVerify(exactly = 1) { runDao.deleteRun(any()) }
+        coVerify(exactly = 1) { runDao.deleteRunWithPath(any()) }
         assertEquals(1, captured.captured.id)
+    }
+
+    @Test
+    fun `getRunById는 Entity를 Domain으로 매핑하고 없으면 null을 돌려준다`() = runTest {
+        coEvery { runDao.getRunById(1) } returns entity
+        coEvery { runDao.getRunById(2) } returns null
+
+        assertEquals(run, repository.getRunById(1))
+        assertNull(repository.getRunById(2))
+    }
+
+    @Test
+    fun `getRunPath는 저장된 경로를 복원하고 경로가 없으면 빈 리스트를 돌려준다`() = runTest {
+        val path = listOf(listOf(LatLng(37.5, 127.0)), listOf(LatLng(37.502, 127.002)))
+        coEvery { runDao.getEncodedPath(1) } returns PolylineEncoder.encodePath(path)
+        coEvery { runDao.getEncodedPath(2) } returns null
+
+        assertEquals(2, repository.getRunPath(1).size)
+        assertTrue(repository.getRunPath(2).isEmpty())
     }
 
     @Test

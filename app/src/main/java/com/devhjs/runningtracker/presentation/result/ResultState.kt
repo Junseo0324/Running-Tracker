@@ -1,6 +1,7 @@
 package com.devhjs.runningtracker.presentation.result
 
 import androidx.compose.runtime.Immutable
+import com.devhjs.runningtracker.domain.affiliate.CoupangRecommendation
 import com.devhjs.runningtracker.service.Polylines
 
 
@@ -10,5 +11,6 @@ data class ResultState(
     val timeInMillis: Long = 0L,
     val avgSpeed: Float = 0f,
     val caloriesBurned: Int = 0,
-    val pathPoints: Polylines = mutableListOf()
+    val pathPoints: Polylines = mutableListOf(),
+    val coupangRecommendation: CoupangRecommendation? = null
 )

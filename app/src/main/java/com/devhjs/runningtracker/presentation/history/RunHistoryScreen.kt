@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.devhjs.runningtracker.presentation.components.AdMobBanner
+import com.devhjs.runningtracker.presentation.components.CoupangPartnersRow
 import com.devhjs.runningtracker.presentation.components.RunItemCard
 import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
 import com.devhjs.runningtracker.presentation.designsystem.TextWhite
@@ -71,8 +72,19 @@ fun RunHistoryScreen(
             contentPadding = PaddingValues(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            if (state.coupangRecommendations.isNotEmpty()) {
+                item {
+                    CoupangPartnersRow(
+                        recommendations = state.coupangRecommendations,
+                        onClick = { onAction(RunHistoryAction.OnCoupangClick(it.url)) }
+                    )
+                }
+            }
             items(state.runs) { run ->
-                RunItemCard(run)
+                RunItemCard(
+                    run = run,
+                    onClick = { run.id?.let { onAction(RunHistoryAction.OnRunClick(it)) } }
+                )
             }
         }
 

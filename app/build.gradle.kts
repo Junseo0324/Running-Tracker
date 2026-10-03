@@ -135,6 +135,9 @@ dependencies {
     
     // Timber
     implementation(libs.timber)
+
+    // Coil (쿠팡 추천 상품 이미지)
+    implementation(libs.coil.compose)
     
     // Serialization
     implementation(libs.kotlinx.serialization.json)
@@ -148,6 +151,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
@@ -166,3 +170,6 @@ ksp {
     // Room 스키마를 JSON 으로 내보내 마이그레이션 안전성을 검증할 수 있게 한다.
     arg("room.schemaLocation", "$projectDir/schemas")
 }
+
+// 마이그레이션 테스트(MigrationTestHelper)가 내보낸 스키마를 읽을 수 있도록 androidTest 에셋에 포함한다.
+android.sourceSets.getByName("androidTest").assets.srcDir("$projectDir/schemas")
