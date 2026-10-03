@@ -31,10 +31,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.devhjs.runningtracker.R
 import com.devhjs.runningtracker.presentation.components.AdMobBanner
 import com.devhjs.runningtracker.presentation.components.FullScreenMap
 import com.devhjs.runningtracker.presentation.components.PrimaryButton
@@ -93,7 +95,7 @@ fun HomeScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = if (state.isGpsEnabled) "GPS 연결됨" else "GPS 연결 안 됨",
+                                text = stringResource(if (state.isGpsEnabled) R.string.gps_connected else R.string.gps_disconnected),
                                 color = TextWhite,
                                 style = MaterialTheme.typography.labelMedium
                             )
@@ -112,7 +114,7 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "오늘도 달려볼까요?",
+                        text = stringResource(R.string.home_title),
                         color = TextWhite,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -121,7 +123,7 @@ fun HomeScreen(
                             .padding(bottom = 8.dp)
                     )
                      Text(
-                        text = "준비가 되면 시작 버튼을 눌러주세요.",
+                        text = stringResource(R.string.home_subtitle),
                         color = TextGrey,
                         fontSize = 14.sp,
                         modifier = Modifier
@@ -130,7 +132,7 @@ fun HomeScreen(
                     )
 
                     PrimaryButton(
-                        text = "운동 시작",
+                        text = stringResource(R.string.start_workout),
                         onClick = {
                             onAction(HomeAction.OnStartClick)
                         }
@@ -150,7 +152,7 @@ fun HomeScreen(
                         border = BorderStroke(1.dp, RunningGreen)
                     ) {
                         Text(
-                            text = "러닝 기록",
+                            text = stringResource(R.string.run_history),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold
                         )

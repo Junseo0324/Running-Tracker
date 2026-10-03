@@ -22,10 +22,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.devhjs.runningtracker.R
 import com.devhjs.runningtracker.core.Constants.MAP_ZOOM
 import com.devhjs.runningtracker.core.Constants.POLYLINE_COLOR
 import com.devhjs.runningtracker.core.Constants.POLYLINE_WIDTH
@@ -34,6 +36,8 @@ import com.devhjs.runningtracker.core.util.TimeUtils
 import com.devhjs.runningtracker.presentation.designsystem.RunningGreen
 import com.devhjs.runningtracker.presentation.designsystem.TextGrey
 import com.devhjs.runningtracker.presentation.designsystem.TextWhite
+import com.devhjs.runningtracker.presentation.util.formatDistanceKm
+import com.devhjs.runningtracker.presentation.util.ltrIsolate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -57,30 +61,30 @@ fun RunStatsSummary(
 ) {
     Column(modifier = modifier) {
         Text(
-            text = String.format("%.2f", distanceInMeters / 1000f),
+            text = formatDistanceKm(distanceInMeters, fractionDigits = 2),
             color = RunningGreen,
             fontSize = 72.sp,
             fontWeight = FontWeight.Black,
             fontStyle = FontStyle.Italic
         )
-        Text(text = "킬로미터", color = TextGrey, fontSize = 16.sp)
+        Text(text = stringResource(R.string.kilometers), color = TextGrey, fontSize = 16.sp)
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Row(modifier = Modifier.fillMaxWidth()) {
             SummaryStat(
-                value = TimeUtils.getFormattedPace(avgSpeedInKmh),
-                label = "평균 페이스",
+                value = ltrIsolate(TimeUtils.getFormattedPace(avgSpeedInKmh)),
+                label = stringResource(R.string.avg_pace),
                 modifier = Modifier.weight(1f)
             )
             SummaryStat(
                 value = TimeUtils.getFormattedStopWatchTime(timeInMillis),
-                label = "시간",
+                label = stringResource(R.string.time),
                 modifier = Modifier.weight(1f)
             )
             SummaryStat(
                 value = "$caloriesBurned",
-                label = "칼로리",
+                label = stringResource(R.string.calories),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -177,7 +181,7 @@ fun RouteImage(
         bitmap?.let {
             Image(
                 bitmap = it,
-                contentDescription = "Run Path",
+                contentDescription = stringResource(R.string.cd_run_path),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.fillMaxSize()
             )

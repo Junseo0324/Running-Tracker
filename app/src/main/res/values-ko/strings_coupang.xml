@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="coupang_section_title">러닝 용품 추천</string>
+    <string name="coupang_view">쿠팡에서 보기</string>
+    <string name="coupang_disclosure">이 게시물은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</string>
+    <string name="coupang_shoe_mileage">누적 %1$dkm 달성! 러닝화를 점검해볼 때예요</string>
+    <string name="coupang_shoes_title">러닝화</string>
+    <string name="coupang_shoes_message">발에 맞는 러닝화로 부상을 줄여보세요</string>
+    <string name="coupang_gear_title">러닝 벨트 · 암밴드</string>
+    <string name="coupang_gear_message">휴대폰을 흔들림 없이 들고 달려보세요</string>
+    <string name="coupang_nutrition_title">에너지젤</string>
+    <string name="coupang_nutrition_message">5km 넘게 달렸다면 에너지 보충도 챙겨보세요</string>
+    <string name="coupang_electrolyte_title">전해질 · 이온음료</string>
+    <string name="coupang_electrolyte_message">땀으로 빠진 수분과 전해질을 채워보세요</string>
+    <string name="coupang_socks_title">러닝 양말</string>
+    <string name="coupang_socks_message">물집과 쓸림을 줄여줘요</string>
+    <string name="coupang_apparel_title">러닝복</string>
+    <string name="coupang_apparel_message">가볍고 땀이 잘 마르는 기능성 의류</string>
+    <string name="coupang_watch_title">스마트워치</string>
+    <string name="coupang_watch_message">페이스와 심박을 손목에서 바로 확인해요</string>
+</resources>

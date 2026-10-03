@@ -26,18 +26,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.devhjs.runningtracker.R
 import com.devhjs.runningtracker.core.util.ImageUtils
 import com.devhjs.runningtracker.core.util.TimeUtils
 import com.devhjs.runningtracker.domain.model.Run
 import com.devhjs.runningtracker.presentation.designsystem.RunningGreen
 import com.devhjs.runningtracker.presentation.designsystem.TextGrey
 import com.devhjs.runningtracker.presentation.designsystem.TextWhite
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.devhjs.runningtracker.presentation.util.formatDistanceKm
+import com.devhjs.runningtracker.presentation.util.formatRunDate
 
 private val THUMBNAIL_SIZE = 100.dp
 
@@ -46,8 +49,8 @@ fun RunItemCard(
     run: Run,
     onClick: () -> Unit = {}
 ) {
-    val dateFormat = remember { SimpleDateFormat("MM월 dd일 • a h:mm", Locale.KOREA) }
-    val dateString = remember(run.timestamp) { dateFormat.format(run.timestamp) }
+    val locale = LocalConfiguration.current.locales[0]
+    val dateString = remember(run.timestamp, locale) { formatRunDate(run.timestamp, locale, withYear = false) }
 
     // 썸네일은 표시 크기에 맞춰 축소 디코딩하고, 리컴포지션마다 다시 만들지 않도록 기억해 둔다.
     // remember 가 없으면 매 리컴포지션마다 원본 크기의 비트맵이 새로 할당된다.
@@ -82,7 +85,7 @@ fun RunItemCard(
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(
-                        text = "${String.format("%.1f", run.distanceInMeters / 1000f)}",
+                        text = formatDistanceKm(run.distanceInMeters.toFloat(), fractionDigits = 1),
                         color = TextWhite,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold
@@ -99,7 +102,7 @@ fun RunItemCard(
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                     Column {
-                        Text(text = "시간", color = TextGrey, fontSize = 12.sp)
+                        Text(text = stringResource(R.string.time), color = TextGrey, fontSize = 12.sp)
                         Text(
                             text = TimeUtils.getFormattedStopWatchTime(run.timeInMillis),
                             color = TextWhite,
@@ -108,7 +111,7 @@ fun RunItemCard(
                         )
                     }
                     Column {
-                        Text(text = "칼로리", color = TextGrey, fontSize = 12.sp)
+                        Text(text = stringResource(R.string.calories), color = TextGrey, fontSize = 12.sp)
                         Text(
                             text = "${run.caloriesBurned}",
                             color = TextWhite,
@@ -129,7 +132,7 @@ fun RunItemCard(
                 thumbnail?.let {
                     Image(
                         bitmap = it,
-                        contentDescription = "Run Path",
+                        contentDescription = stringResource(R.string.cd_run_path),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )

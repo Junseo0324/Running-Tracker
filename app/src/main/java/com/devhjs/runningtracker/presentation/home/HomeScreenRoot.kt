@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.devhjs.runningtracker.R
 import com.devhjs.runningtracker.presentation.util.SystemBarIcons
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -75,7 +76,7 @@ fun HomeScreenRoot(
                             locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
                     if(!isGpsEnabled) {
-                        Toast.makeText(context, "GPS를 켜주세요.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.turn_on_gps, Toast.LENGTH_SHORT).show()
                         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                         context.startActivity(intent)
                         return@HomeScreen

@@ -69,6 +69,10 @@ android {
 
         }
         debug {
+            // 번역 누락 · RTL 깨짐을 확인할 수 있도록 의사 언어(en-XA, ar-XB)를 켠다.
+            // 기기 설정 > 개발자 옵션에서 해당 언어를 고르면 적용된다.
+            isPseudoLocalesEnabled = true
+
             // Debug Configuration: Use Test IDs
             manifestPlaceholders["ADMOB_APP_ID"] = admobAppIdTest
             buildConfigField("String", "ADMOB_BANNER_ID", "\"$admobBannerIdTest\"")
@@ -85,6 +89,11 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+    androidResources {
+        // values-xx 폴더를 기준으로 locales_config 를 만들어 Android 13+ 앱별 언어 설정에 노출한다.
+        // 기본 언어는 src/main/res/resources.properties 의 unqualifiedResLocale.
+        generateLocaleConfig = true
     }
     packaging {
         resources {

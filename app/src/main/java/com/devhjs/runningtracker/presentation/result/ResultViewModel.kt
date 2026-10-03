@@ -15,6 +15,7 @@ import com.devhjs.runningtracker.domain.affiliate.CoupangRecommender
 import com.devhjs.runningtracker.domain.manager.RunningManager
 import com.devhjs.runningtracker.domain.model.Run
 import com.devhjs.runningtracker.domain.repository.MainRepository
+import com.devhjs.runningtracker.domain.region.CountryProvider
 import com.devhjs.runningtracker.presentation.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,8 +32,12 @@ import javax.inject.Inject
 @HiltViewModel
 class ResultViewModel @Inject constructor(
     val mainRepository: MainRepository,
-    private val runningManager: RunningManager
+    private val runningManager: RunningManager,
+    countryProvider: CountryProvider
 ) : ViewModel() {
+
+    // 결과 화면 동안 나라가 바뀔 일은 없고, 통계는 위치가 들어올 때마다 다시 계산되므로 한 번만 읽는다.
+    private val countryCode = countryProvider.currentCountryCode()
 
     private val _state = MutableStateFlow(ResultState())
     val state = _state.asStateFlow()
@@ -80,7 +85,7 @@ class ResultViewModel @Inject constructor(
                 distanceInMeters = distanceInMeters,
                 avgSpeed = avgSpeed,
                 caloriesBurned = caloriesBurned,
-                coupangRecommendation = CoupangRecommender.forRun(distanceInMeters)
+                coupangRecommendation = CoupangRecommender.forRun(distanceInMeters, countryCode)
             )
         }
     }

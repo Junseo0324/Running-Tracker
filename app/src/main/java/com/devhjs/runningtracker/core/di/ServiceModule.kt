@@ -23,6 +23,6 @@ object ServiceModule {
         .setAutoCancel(false)
         .setOngoing(true)
         .setSmallIcon(R.drawable.workout_run)
-        .setContentTitle("Running Tracker")
+        .setContentTitle(app.getString(R.string.notification_title))
         .setContentText("00:00:00")
 }

@@ -22,10 +22,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.devhjs.runningtracker.R
 import com.devhjs.runningtracker.presentation.components.AdMobBanner
 import com.devhjs.runningtracker.presentation.components.CoupangPartnersCard
 import com.devhjs.runningtracker.presentation.components.PrimaryButton
@@ -64,10 +66,10 @@ fun ResultScreen(
                     onClick = { onAction(ResultAction.OnDiscardClick) },
                     modifier = Modifier.align(Alignment.CenterStart)
                 ) {
-                    Icon(Icons.Default.Close, contentDescription = "Close", tint = TextWhite)
+                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cd_close), tint = TextWhite)
                 }
                 Text(
-                    text = "운동 결과",
+                    text = stringResource(R.string.workout_result),
                     color = TextWhite,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
@@ -97,7 +99,7 @@ fun ResultScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             PrimaryButton(
-                text = "기록 저장",
+                text = stringResource(R.string.save_run),
                 onClick = { onAction(ResultAction.OnSaveClick) }
             )
 

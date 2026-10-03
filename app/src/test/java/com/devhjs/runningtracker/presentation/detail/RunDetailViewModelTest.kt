@@ -3,6 +3,7 @@ package com.devhjs.runningtracker.presentation.detail
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.devhjs.runningtracker.domain.model.Run
+import com.devhjs.runningtracker.domain.region.CountryProvider
 import com.devhjs.runningtracker.domain.repository.MainRepository
 import com.google.android.gms.maps.model.LatLng
 import io.mockk.Runs
@@ -51,7 +52,10 @@ class RunDetailViewModelTest {
 
     private fun createViewModel(runId: Int = 1) = RunDetailViewModel(
         savedStateHandle = SavedStateHandle(mapOf("runId" to runId)),
-        mainRepository = repository
+        mainRepository = repository,
+        countryProvider = object : CountryProvider {
+            override fun currentCountryCode() = "KR"
+        }
     )
 
     @Test

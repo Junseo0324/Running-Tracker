@@ -43,10 +43,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.devhjs.runningtracker.R
 import com.devhjs.runningtracker.core.Constants.POLYLINE_COLOR
 import com.devhjs.runningtracker.core.Constants.POLYLINE_WIDTH
 import com.devhjs.runningtracker.core.util.LocationUtils
@@ -56,6 +58,8 @@ import com.devhjs.runningtracker.presentation.components.StatusBarScrim
 import com.devhjs.runningtracker.presentation.designsystem.RunningBlack
 import com.devhjs.runningtracker.presentation.designsystem.RunningGreen
 import com.devhjs.runningtracker.presentation.designsystem.TextWhite
+import com.devhjs.runningtracker.presentation.util.formatDistanceKm
+import com.devhjs.runningtracker.presentation.util.ltrIsolate
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
@@ -102,7 +106,7 @@ fun RunScreen(
                     .background(Color.Black.copy(alpha = 0.4f))
             ) {
                 Text(
-                    text = "일시정지됨",
+                    text = stringResource(R.string.paused),
                     color = TextWhite,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
@@ -133,7 +137,7 @@ fun RunScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "운동 시간",
+                        text = stringResource(R.string.elapsed_time),
                         color = Color.Gray,
                         fontSize = 14.sp
                     )
@@ -150,8 +154,8 @@ fun RunScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        StatsCardItem(label = "km", value = String.format("%.2f", state.distanceInMeters / 1000f), icon= Icons.Default.Speed)
-                        StatsCardItem(label = "평균 페이스", value = TimeUtils.getFormattedPace(state.avgSpeed), icon= Icons.Default.Speed)
+                        StatsCardItem(label = "km", value = formatDistanceKm(state.distanceInMeters, fractionDigits = 2), icon= Icons.Default.Speed)
+                        StatsCardItem(label = stringResource(R.string.avg_pace), value = ltrIsolate(TimeUtils.getFormattedPace(state.avgSpeed)), icon= Icons.Default.Speed)
                         StatsCardItem(label = "kcal", value = "${state.caloriesBurned}", icon =Icons.Default.LocalFireDepartment)
                     }
                 }
@@ -175,7 +179,7 @@ fun RunScreen(
                                 .size(56.dp)
                                 .background(Color.Black.copy(alpha = 0.6f), CircleShape)
                         ) {
-                            Icon(Icons.Default.Lock, contentDescription = "Lock", tint = TextWhite)
+                            Icon(Icons.Default.Lock, contentDescription = stringResource(R.string.cd_lock), tint = TextWhite)
                         }
 
                         Button(
@@ -186,7 +190,7 @@ fun RunScreen(
                         ) {
                              Icon(
                                  imageVector = Icons.Default.Pause, 
-                                 contentDescription = "Pause",
+                                 contentDescription = stringResource(R.string.cd_pause),
                                  tint = RunningBlack,
                                  modifier = Modifier.size(32.dp)
                              )
@@ -210,7 +214,7 @@ fun RunScreen(
                     ) {
                         Icon(Icons.Default.LockOpen, contentDescription = null, tint = RunningGreen)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("길게 눌러 잠금 해제", color = TextWhite, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.hold_to_unlock), color = TextWhite, fontWeight = FontWeight.Bold)
                     }
                 } else {
                     Row(
@@ -224,7 +228,7 @@ fun RunScreen(
                                 } else {
                                     Toast.makeText(
                                         context,
-                                        "위치 권한이 필요합니다. 설정에서 권한을 허용해주세요.",
+                                        R.string.location_permission_required,
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
@@ -240,7 +244,7 @@ fun RunScreen(
                                  Icon(Icons.Default.PlayArrow, contentDescription = null, tint = RunningBlack)
                                  Spacer(modifier = Modifier.width(8.dp))
                                  Text(
-                                     text = if (state.curTimeInMillis > 0L) "재개" else "시작", 
+                                     text = stringResource(if (state.curTimeInMillis > 0L) R.string.resume else R.string.start), 
                                      color = RunningBlack, 
                                      fontSize = 18.sp, 
                                      fontWeight = FontWeight.Bold
@@ -260,7 +264,7 @@ fun RunScreen(
                              Row(verticalAlignment = Alignment.CenterVertically) {
                                  Icon(Icons.Default.Stop, contentDescription = null, tint = TextWhite)
                                  Spacer(modifier = Modifier.width(8.dp))
-                                 Text("종료", color = TextWhite, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                 Text(stringResource(R.string.finish), color = TextWhite, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                              }
                         }
                     }
@@ -278,7 +282,7 @@ fun RunScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "GPS가 꺼져있습니다. 위치 추적을 위해 GPS를 켜주세요.",
+                    text = stringResource(R.string.gps_off_banner),
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )

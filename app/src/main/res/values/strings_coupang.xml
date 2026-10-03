@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 쿠팡 파트너스는 한국 지역에서만 노출되므로 영어(기본)와 한국어만 둔다. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="coupang_section_title">Recommended running gear</string>
+    <string name="coupang_view">View on Coupang</string>
+    <string name="coupang_disclosure">This post is part of Coupang Partners activity, and a commission is received accordingly.</string>
+    <string name="coupang_shoe_mileage">%1$d km logged! Time to check your running shoes</string>
+    <string name="coupang_shoes_title">Running shoes</string>
+    <string name="coupang_shoes_message">Reduce injuries with shoes that fit you</string>
+    <string name="coupang_gear_title">Running belt · Armband</string>
+    <string name="coupang_gear_message">Run with your phone held steady</string>
+    <string name="coupang_nutrition_title">Energy gel</string>
+    <string name="coupang_nutrition_message">Ran over 5 km? Remember to refuel</string>
+    <string name="coupang_electrolyte_title">Electrolytes · Sports drinks</string>
+    <string name="coupang_electrolyte_message">Replace the fluids and electrolytes you sweat out</string>
+    <string name="coupang_socks_title">Running socks</string>
+    <string name="coupang_socks_message">Prevents blisters and chafing</string>
+    <string name="coupang_apparel_title">Running wear</string>
+    <string name="coupang_apparel_message">Light, quick-drying performance wear</string>
+    <string name="coupang_watch_title">Smartwatch</string>
+    <string name="coupang_watch_message">Check pace and heart rate right on your wrist</string>
+</resources>

@@ -2,15 +2,8 @@ package com.devhjs.runningtracker.domain.affiliate
 
 import com.devhjs.runningtracker.core.Constants
 
-enum class CoupangCategory(val title: String, val message: String) {
-    RUNNING_SHOES("러닝화", "발에 맞는 러닝화로 부상을 줄여보세요"),
-    GEAR("러닝 벨트 · 암밴드", "휴대폰을 흔들림 없이 들고 달려보세요"),
-    NUTRITION("에너지젤", "5km 넘게 달렸다면 에너지 보충도 챙겨보세요"),
-    ELECTROLYTE("전해질 · 이온음료", "땀으로 빠진 수분과 전해질을 채워보세요"),
-    SOCKS("러닝 양말", "물집과 쓸림을 줄여줘요"),
-    APPAREL("러닝복", "가볍고 땀이 잘 마르는 기능성 의류"),
-    WATCH("스마트워치", "페이스와 심박을 손목에서 바로 확인해요")
-}
+/** 표시 문구는 화면 쪽 문자열 리소스에서 카테고리별로 고른다. */
+enum class CoupangCategory { RUNNING_SHOES, GEAR, NUTRITION, ELECTROLYTE, SOCKS, APPAREL, WATCH }
 
 /** 카테고리에 연결된 파트너스 링크와 대표 상품 이미지. 비어있는 값은 미설정으로 본다. */
 data class CoupangLink(
@@ -20,18 +13,21 @@ data class CoupangLink(
 
 data class CoupangRecommendation(
     val category: CoupangCategory,
-    val title: String,
-    val message: String,
     val url: String,
     /** 대표 상품 이미지. 없으면 화면에서 카테고리 아이콘으로 대신한다. */
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    /** 러닝화 교체 문구를 띄울 때의 누적 거리(km). 해당 없으면 null. */
+    val shoeMileageKm: Long? = null
 )
 
 /**
  * 쿠팡 파트너스 추천 카드에 어떤 카테고리를 보여줄지 정한다.
- * 링크가 비어있는 카테고리는 결과에서 빠져 카드가 표시되지 않는다.
+ * - 쿠팡은 국내 배송이고 대가성 문구도 국내 법 기준이라 한국에서만 노출한다.
+ * - 링크가 비어있는 카테고리는 결과에서 빠져 카드가 표시되지 않는다.
  */
 object CoupangRecommender {
+    private const val AVAILABLE_COUNTRY_CODE = "KR"
+
     /** 이 거리 이상 달린 날은 에너지젤을 추천한다. */
     const val LONG_RUN_METERS = 5_000f
 
@@ -48,39 +44,39 @@ object CoupangRecommender {
         CoupangCategory.WATCH
     )
 
+    fun isAvailableIn(countryCode: String): Boolean =
+        countryCode.equals(AVAILABLE_COUNTRY_CODE, ignoreCase = true)
+
     fun forRun(
         distanceInMeters: Float,
+        countryCode: String,
         linkOf: (CoupangCategory) -> CoupangLink = ::defaultLink
     ): CoupangRecommendation? {
+        if (!isAvailableIn(countryCode)) return null
         val category = if (distanceInMeters >= LONG_RUN_METERS) CoupangCategory.NUTRITION else CoupangCategory.GEAR
-        return build(category, category.message, linkOf)
+        return build(category, linkOf)
     }
 
     fun forHistory(
         totalDistanceInMeters: Long,
+        countryCode: String,
         linkOf: (CoupangCategory) -> CoupangLink = ::defaultLink
     ): List<CoupangRecommendation> {
-        val shoeMessage = if (totalDistanceInMeters >= SHOE_REPLACE_METERS) {
-            "누적 ${totalDistanceInMeters / 1000}km 달성! 러닝화를 점검해볼 때예요"
-        } else {
-            CoupangCategory.RUNNING_SHOES.message
-        }
-        val shoes = build(CoupangCategory.RUNNING_SHOES, shoeMessage, linkOf)
-        val extras = HISTORY_EXTRAS.mapNotNull { build(it, it.message, linkOf) }
+        if (!isAvailableIn(countryCode)) return emptyList()
+        val shoeMileageKm = (totalDistanceInMeters / 1000).takeIf { totalDistanceInMeters >= SHOE_REPLACE_METERS }
+        val shoes = build(CoupangCategory.RUNNING_SHOES, linkOf)?.copy(shoeMileageKm = shoeMileageKm)
+        val extras = HISTORY_EXTRAS.mapNotNull { build(it, linkOf) }
         return listOfNotNull(shoes) + extras
     }
 
     private fun build(
         category: CoupangCategory,
-        message: String,
         linkOf: (CoupangCategory) -> CoupangLink
     ): CoupangRecommendation? {
         val link = linkOf(category)
         if (link.url.isBlank()) return null
         return CoupangRecommendation(
             category = category,
-            title = category.title,
-            message = message,
             url = link.url,
             imageUrl = link.imageUrl.ifBlank { null }
         )
