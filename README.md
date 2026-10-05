@@ -106,9 +106,9 @@ Hilt를 사용해 컴포넌트 간 결합도를 낮추고 의존성을 주입합
 
 ## 📸 스크린샷
 
-| 홈 | 운동 시작 | 종료 | 저장된 런닝 기록 |
+| 홈 | 러닝 중 | 운동 결과 | 러닝 기록 |
 |----|-----------|----------|------|
-| <img src="https://github.com/user-attachments/assets/d9bf5863-918a-4fd7-b9d4-7605a38b1e05" width="180"/> | <img src="https://github.com/user-attachments/assets/8e8237da-89ac-4fe8-86b0-ac9b831e9b58" width="180"/> |<img src="https://github.com/user-attachments/assets/b56be834-1bb8-438c-889a-44721fd7bf34" width="180"/> | <img src="https://github.com/user-attachments/assets/1e491055-1eb4-49da-a062-0474984a1df3" width="180"/>  |
+| <img src="docs/screenshots/1_home.png" width="180"/> | <img src="docs/screenshots/2_running.png" width="180"/> | <img src="docs/screenshots/3_result.png" width="180"/> | <img src="docs/screenshots/4_history.png" width="180"/> |
 
 
 ## 다운로드
