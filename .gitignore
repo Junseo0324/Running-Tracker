@@ -39,3 +39,6 @@ google-services.json
 # 개인 문서 (포트폴리오 / 트러블슈팅 노트)
 PORTFOLIO.md
 Troubleshooting_*.md
+
+# 스토어 스크린샷 원본 (README 용은 docs/screenshots 에 둔다)
+store-screenshots/

@@ -30,6 +30,9 @@ fun AdMobBanner(
     modifier: Modifier = Modifier,
     adId: String = BuildConfig.ADMOB_BANNER_ID
 ) {
+    // 스토어 스크린샷 촬영용 디버그 빌드에서는 광고를 그리지 않는다.
+    if (BuildConfig.SCREENSHOT_MODE) return
+
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 

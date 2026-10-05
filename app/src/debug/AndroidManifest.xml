@@ -17,6 +17,16 @@
             </intent-filter>
         </receiver>
 
+        <!-- 스토어 스크린샷용 데모 데이터 리시버. debug 소스셋에만 있다. -->
+        <receiver
+            android:name=".debug.DemoDataReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.devhjs.runningtracker.debug.DEMO_SEED" />
+                <action android:name="com.devhjs.runningtracker.debug.DEMO_RUN" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

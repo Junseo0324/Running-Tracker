@@ -55,6 +55,10 @@ object AdHelper {
     }
 
     fun showInterstitial(context: Context, onAdDismissed: () -> Unit = {}) {
+        if (BuildConfig.SCREENSHOT_MODE) {
+            onAdDismissed()
+            return
+        }
         val ad = interstitialAd
         if (ad != null && context is Activity) {
             ad.fullScreenContentCallback = object : FullScreenContentCallback() {
@@ -87,6 +91,10 @@ object AdHelper {
     private val HISTORY_AD_COUNT_KEY = intPreferencesKey("history_ad_count")
 
     suspend fun showInterstitialForHistory(context: Context, frequency: Int = 3, onAdDismissed: () -> Unit = {}) {
+        if (BuildConfig.SCREENSHOT_MODE) {
+            onAdDismissed()
+            return
+        }
         val prefs = context.dataStore.data.first()
         val currentCount = (prefs[HISTORY_AD_COUNT_KEY] ?: 0) + 1
         
