@@ -66,6 +66,7 @@ android {
              manifestPlaceholders["ADMOB_APP_ID"] = admobAppIdReal
              buildConfigField("String", "ADMOB_BANNER_ID", "\"$admobBannerIdReal\"")
              buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$admobInterstitialIdReal\"")
+             buildConfigField("boolean", "SCREENSHOT_MODE", "false")
 
         }
         debug {
@@ -77,6 +78,8 @@ android {
             manifestPlaceholders["ADMOB_APP_ID"] = admobAppIdTest
             buildConfigField("String", "ADMOB_BANNER_ID", "\"$admobBannerIdTest\"")
             buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$admobInterstitialIdTest\"")
+            // 스토어 스크린샷 촬영용: ./gradlew ... -PscreenshotMode=true 로 빌드하면 광고를 숨긴다.
+            buildConfigField("boolean", "SCREENSHOT_MODE", (project.findProperty("screenshotMode") == "true").toString())
         }
     }
     compileOptions {
